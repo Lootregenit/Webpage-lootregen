@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lootregen · Platform Engineer</title>
+
+<!-- SEO -->
+<meta name="description" content="18-year-old Platform Developer Apprentice from Switzerland. Passionate about Kubernetes, Docker, Terraform and everything infrastructure.">
+<meta name="keywords" content="Platform Engineer, DevOps, Kubernetes, Docker, Terraform, Switzerland">
+<meta name="author" content="Mateusz Mirosław Woźniak">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph (LinkedIn, Facebook Vorschau) -->
+<meta property="og:title" content="Lootregen · Platform Engineer">
+<meta property="og:description" content="18-year-old Platform Developer Apprentice from Switzerland.">
+<meta property="og:url" content="https://lootregen.com">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://lootregen.com/preview.png">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Lootregen · Platform Engineer">
+<meta name="twitter:description" content="18-year-old Platform Developer Apprentice from Switzerland.">
+<meta name="twitter:image" content="https://lootregen.com/preview.png">
+
+<!-- Canonical -->
+<link rel="canonical" href="https://lootregen.com">
+<title>Lootregen · Platform Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+<style>
+:root {
+  --bg:#05050a;--bg2:#0a0a14;--bg3:#0f0f1e;
+  --text:#e0f0ff;--muted:#5a6a8a;
+  --accent:#00f0ff;--accent2:#ff2d6a;--accent3:#39ff14;
+  --border:rgba(0,240,255,0.12);--card:rgba(0,240,255,0.03);
+  --gold:#ffd700;--gold2:rgba(255,215,0,0.12);
+  --neon-glow:0 0 10px rgba(0,240,255,0.3), 0 0 40px rgba(0,240,255,0.1);
+  --neon-pink:0 0 10px rgba(255,45,106,0.3), 0 0 40px rgba(255,45,106,0.1);
+  --mono:'Space Mono',monospace;--sans:'Syne',sans-serif;
+  --tr:0.4s cubic-bezier(0.4,0,0.2,1);
+}
+[data-theme="light"]{
+  --bg:#e8ecf4;--bg2:#dde2ee;--bg3:#d0d6e6;
+  --text:#0a0a1a;--muted:#4a5068;
+  --accent:#0090aa;--accent2:#c0204a;--accent3:#00882a;
+  --border:rgba(0,144,170,0.2);--card:rgba(0,0,0,0.04);
+  --neon-glow:none;--neon-pink:none;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--mono);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;cursor:none;transition:background var(--tr),color var(--tr)}
+
+/* SCANLINES OVERLAY */
+body::after{content:'';position:fixed;inset:0;z-index:9990;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);
+  opacity:0.4}
+[data-theme="light"] body::after{opacity:0.05}
+
+/* CRT VIGNETTE */
+body::before{content:'';position:fixed;inset:0;z-index:9989;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,0.5) 100%)}
+[data-theme="light"] body::before{background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,0.08) 100%)}
+
+/* GLITCH ON H1 */
+@keyframes glitch1{
+  0%,92%,100%{clip-path:inset(0 0 0 0);transform:translate(0)}
+  93%{clip-path:inset(20% 0 40% 0);transform:translate(-4px,0)}
+  95%{clip-path:inset(60% 0 5% 0);transform:translate(4px,0)}
+  97%{clip-path:inset(40% 0 20% 0);transform:translate(-2px,0)}
+}
+@keyframes glitch2{
+  0%,92%,100%{clip-path:inset(0 0 0 0);transform:translate(0)}
+  94%{clip-path:inset(50% 0 10% 0);transform:translate(3px,0)}
+  96%{clip-path:inset(10% 0 60% 0);transform:translate(-3px,0)}
+  98%{clip-path:inset(30% 0 30% 0);transform:translate(2px,0)}
+}
+h1{position:relative}
+h1::before,h1::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+h1::before{color:var(--accent2);animation:glitch1 4s infinite;opacity:0.6;z-index:-1}
+h1::after{color:var(--accent);animation:glitch2 4s infinite;opacity:0.4;z-index:-1}
+
+/* NEON TEXT GLOW */
+.neon-text{text-shadow:var(--neon-glow)}
+.neon-pink{text-shadow:var(--neon-pink)}
+
+/* CURSOR */
+.cur{position:fixed;width:8px;height:8px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width 0.3s, height 0.3s, background 0.3s;box-shadow:0 0 8px var(--accent)}
+.cur.hover{width:40px;height:40px;background:rgba(0,240,255,0.15);mix-blend-mode:normal;box-shadow:0 0 20px var(--accent)}
+.cur-ring{position:fixed;width:32px;height:32px;border:1px solid var(--accent);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:0.5;transition:left 0.12s ease-out,top 0.12s ease-out,width 0.3s,height 0.3s,opacity 0.3s;box-shadow:0 0 6px rgba(0,240,255,0.2)}
+.cur.hover ~ .cur-ring, .cur-ring.hover{width:50px;height:50px;opacity:0.2}
+
+/* PARTICLES */
+.particles-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.5}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.25rem 2.5rem;
+  border-bottom:1px solid var(--border);
+  background:rgba(5,5,10,0.9);
+  backdrop-filter:blur(20px);
+  transition:background var(--tr), transform 0.4s ease, box-shadow 0.4s ease;
+}
+nav.scrolled{box-shadow:0 2px 30px rgba(0,240,255,0.08),inset 0 -1px 0 rgba(0,240,255,0.1)}
+nav.nav-hidden{transform:translateY(-100%)}
+[data-theme="light"] nav{background:rgba(232,236,244,0.9)}
+.logo{font-family:var(--sans);font-size:1.2rem;font-weight:800;letter-spacing:-0.02em;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.nav-r{display:flex;align-items:center;gap:1rem}
+.lang-btns{display:flex;gap:4px}
+.lbtn,.tbtn{font-family:var(--mono);font-size:0.68rem;padding:4px 10px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.2s;letter-spacing:0.05em}
+.lbtn.active,.lbtn:hover,.tbtn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* PREMIUM BADGE */
+.premium-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:0.62rem;letter-spacing:0.12em;padding:4px 12px;
+  border-radius:20px;border:1px solid var(--gold);
+  color:var(--gold);background:var(--gold2);
+  text-transform:uppercase;
+}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:8rem 2.5rem 4rem;position:relative;overflow:hidden}
+.hero-inner{max-width:900px;position:relative;z-index:10;color:var(--text)}
+.grid-bg{position:absolute;inset:0;z-index:0;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent);
+  pointer-events:none;}
+.glow{position:absolute;top:20%;left:30%;width:600px;height:600px;z-index:0;background:radial-gradient(circle,rgba(0,240,255,0.06) 0%,rgba(255,45,106,0.03) 40%,transparent 70%);pointer-events:none;transition:transform 0.3s ease-out}
+.hero-top{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.hero-tag{font-size:0.68rem;letter-spacing:0.15em;color:var(--accent);display:flex;align-items:center;gap:8px}
+.hero-tag::before{content:'';display:inline-block;width:24px;height:1px;background:var(--accent)}
+h1{font-family:var(--sans);font-size:clamp(3rem,8vw,7rem);font-weight:800;line-height:0.95;letter-spacing:-0.03em;margin-bottom:1.5rem;position:relative}
+h1 .l2{color:var(--accent);text-shadow:0 0 20px rgba(0,240,255,0.4),0 0 60px rgba(0,240,255,0.15)}
+h1 .l3{-webkit-text-stroke:1px var(--accent2);color:transparent;text-shadow:none}
+[data-theme="light"] h1 .l3{-webkit-text-stroke:1px var(--muted)}
+.hero-desc{font-size:0.83rem;line-height:1.85;color:var(--muted);max-width:500px;margin-bottom:2.5rem}
+.hero-desc span{color:var(--text)}
+.cta-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem}
+.btn{font-family:var(--mono);font-size:0.72rem;letter-spacing:0.1em;padding:12px 24px;border-radius:4px;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block;text-transform:uppercase;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:rgba(255,255,255,0.1);border-radius:50%;transform:translate(-50%,-50%);transition:width 0.6s, height 0.6s}
+.btn:hover::after{width:300px;height:300px}
+.btn-p{background:var(--accent);color:#fff;border:1px solid var(--accent)}
+.btn-p:hover{background:transparent;color:var(--accent)}
+.btn-o{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-o:hover{border-color:var(--accent);color:var(--accent)}
+.status-row{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+.sdot{display:inline-flex;align-items:center;gap:8px;font-size:0.7rem;color:var(--accent3)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(111,255,176,0.4)}50%{box-shadow:0 0 0 6px rgba(111,255,176,0)}}
+
+/* SCROLL REVEAL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-60px);transition:opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1)}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(60px);transition:opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1)}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+.reveal-scale{opacity:0;transform:scale(0.85);transition:opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1)}
+.reveal-scale.visible{opacity:1;transform:scale(1)}
+
+/* HERO ENTRANCE */
+.hero-inner .hero-top{opacity:0;transform:translateY(30px);animation:heroIn 0.5s 0.1s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-inner h1 div:nth-child(1){opacity:0;transform:translateY(60px);animation:heroIn 0.5s 0.2s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-inner h1 div:nth-child(2){opacity:0;transform:translateY(60px);animation:heroIn 0.5s 0.3s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-inner h1 div:nth-child(3){opacity:0;transform:translateY(60px);animation:heroIn 0.5s 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-inner .hero-desc{opacity:0;transform:translateY(30px);animation:heroIn 0.5s 0.5s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-inner .cta-row{opacity:0;transform:translateY(30px);animation:heroIn 0.5s 0.6s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-inner .status-row{opacity:0;transform:translateY(20px);animation:heroIn 0.5s 0.7s cubic-bezier(0.16,1,0.3,1) forwards}
+@keyframes heroIn{to{opacity:1;transform:translateY(0)}}
+
+/* Magnetic hover on buttons */
+.magnetic{transition:transform 0.3s cubic-bezier(0.23,1,0.32,1)}
+
+/* SECTIONS */
+section{padding:6rem 2.5rem;max-width:1000px;margin:0 auto}
+.slabel{font-size:0.62rem;letter-spacing:0.22em;color:var(--accent);text-transform:uppercase;margin-bottom:3rem;display:flex;align-items:center;gap:12px}
+.slabel::after{content:'';flex:1;height:1px;background:var(--border);max-width:200px}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+@media(max-width:640px){.about-grid{grid-template-columns:1fr}}
+.about-text h2{font-family:var(--sans);font-size:2rem;font-weight:800;line-height:1.1;margin-bottom:1.25rem;letter-spacing:-0.02em}
+.about-text p{font-size:0.8rem;line-height:1.9;color:var(--muted);margin-bottom:1rem}
+.about-text p span{color:var(--text)}
+.stats-col{display:flex;flex-direction:column;gap:1rem}
+.si{padding:1.25rem;border:1px solid var(--border);border-radius:8px;background:var(--card);position:relative;overflow:hidden;transition:border-color 0.2s, transform 0.3s, box-shadow 0.3s}
+.si:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 0 20px rgba(0,240,255,0.12),0 0 4px rgba(0,240,255,0.3)}
+.si::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent)}
+.si.gold::before{background:var(--gold)}
+.si.gold{border-color:rgba(255,215,0,0.2)}
+.sn{font-family:var(--sans);font-size:2rem;font-weight:800;color:var(--accent)}
+.si.gold .sn{color:var(--gold)}
+.sl{font-size:0.68rem;color:var(--muted);margin-top:2px;letter-spacing:0.05em}
+
+/* CERTS */
+.certs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:1rem}
+.cc{padding:1.25rem;border:1px solid var(--border);border-radius:8px;background:var(--card);transition:all 0.35s cubic-bezier(0.16,1,0.3,1);position:relative;overflow:hidden;cursor:default}
+.cc:hover{border-color:var(--accent);transform:translateY(-6px);box-shadow:0 0 25px rgba(0,240,255,0.15),0 0 4px rgba(0,240,255,0.4)}
+.cc.in-progress{border-color:var(--gold);box-shadow:0 0 20px rgba(255,215,0,0.08)}
+.cc.in-progress::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,215,0,0.05),transparent)}
+/* Shimmer effect on in-progress card */
+.cc.in-progress::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 40%,rgba(255,215,0,0.06) 50%,transparent 60%);animation:shimmer 3s ease-in-out infinite}
+@keyframes shimmer{0%{transform:translateX(-100%) rotate(0deg)}100%{transform:translateX(100%) rotate(0deg)}}
+.cs{position:absolute;top:0.9rem;right:0.9rem;font-size:0.58rem;padding:2px 8px;border-radius:20px;letter-spacing:0.05em}
+.cs.prog{background:var(--gold2);color:var(--gold);border:1px solid rgba(255,215,0,0.3)}
+.cs.next{background:rgba(111,255,176,0.12);color:var(--accent3);border:1px solid rgba(111,255,176,0.2)}
+.cs.plan{background:rgba(124,111,255,0.1);color:var(--accent);border:1px solid rgba(124,111,255,0.2)}
+.ci{font-size:1.5rem;margin-bottom:0.75rem}
+.cn{font-family:var(--sans);font-size:0.88rem;font-weight:700;margin-bottom:3px}
+.cp{font-size:0.62rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:0.5rem}
+.cprice{font-size:0.65rem;color:var(--accent3);padding:2px 8px;border:1px solid rgba(111,255,176,0.2);border-radius:20px;display:inline-block}
+.cc.in-progress .cprice{color:var(--gold);border-color:rgba(255,215,0,0.25)}
+
+/* STACK */
+.stack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.85rem}
+.stack-cat{grid-column:1/-1;font-size:0.6rem;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;padding:1.2rem 0 0.3rem;border-bottom:1px solid var(--border);margin-top:0.5rem;font-family:var(--mono)}
+.stack-cat:first-child{margin-top:0}
+.stk{padding:1.2rem 1rem;border:1px solid var(--border);border-radius:8px;background:var(--card);text-align:center;font-size:0.78rem;color:var(--muted);transition:all 0.35s cubic-bezier(0.16,1,0.3,1);letter-spacing:0.05em}
+.stk:hover{border-color:var(--accent);color:var(--text);transform:translateY(-6px) scale(1.05);box-shadow:0 0 20px rgba(0,240,255,0.15),0 0 4px rgba(0,240,255,0.3)}
+
+/* JOURNEY */
+.journey{display:flex;flex-direction:column}
+.ji{display:grid;grid-template-columns:130px 1fr;gap:2rem;padding:2rem 0;border-bottom:1px solid var(--border);position:relative}
+.ji:last-child{border-bottom:none}
+/* Animated timeline line */
+.ji::before{content:'';position:absolute;left:65px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom, var(--accent), var(--border));opacity:0.3}
+.jd{font-size:0.68rem;color:var(--accent);padding-top:3px;letter-spacing:0.05em}
+.jc h3{font-family:var(--sans);font-size:1rem;font-weight:700;margin-bottom:6px}
+.jc p{font-size:0.78rem;color:var(--muted);line-height:1.7}
+.jtag{display:inline-block;margin-top:8px;font-size:0.6rem;padding:2px 10px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--muted);letter-spacing:0.06em;transition:all 0.3s}
+.ji:hover .jtag{border-color:var(--accent);color:var(--accent)}
+
+/* CONTACT */
+.contact-box{padding:3rem;border:1px solid var(--border);border-radius:12px;background:var(--card);text-align:center;position:relative;overflow:hidden;transition:border-color 0.4s, box-shadow 0.4s}
+.contact-box:hover{border-color:var(--accent);box-shadow:0 0 40px rgba(0,240,255,0.08),0 0 4px rgba(0,240,255,0.2)}
+.contact-box::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at center,rgba(0,240,255,0.03),rgba(255,45,106,0.02) 40%,transparent 60%);pointer-events:none}
+.contact-box h2{font-family:var(--sans);font-size:2.5rem;font-weight:800;margin-bottom:1rem;letter-spacing:-0.02em}
+.contact-box p{font-size:0.8rem;color:var(--muted);margin-bottom:2rem;line-height:1.8;max-width:480px;margin-left:auto;margin-right:auto}
+.clinks{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.cl{font-size:0.7rem;letter-spacing:0.08em;padding:10px 22px;border:1px solid var(--border);border-radius:4px;color:var(--muted);text-decoration:none;transition:all 0.3s;position:relative;overflow:hidden}
+.cl::before{content:'';position:absolute;bottom:0;left:0;width:100%;height:0;background:var(--accent);transition:height 0.3s;z-index:-1}
+.cl:hover{border-color:var(--accent);color:#fff}
+.cl:hover::before{height:100%}
+
+/* COOKIE BANNER */
+.cookie{
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+  z-index:999;max-width:560px;width:calc(100% - 2rem);
+  background:var(--bg2);border:1px solid var(--accent);
+  border-radius:4px;padding:1.25rem 1.5rem;
+  display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
+  box-shadow:0 0 30px rgba(0,240,255,0.12),0 0 4px rgba(0,240,255,0.3);
+  animation:slideUp 0.3s ease forwards;
+}
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.cookie p{font-size:0.72rem;color:var(--muted);flex:1;line-height:1.6;min-width:200px}
+.cookie p span{color:var(--accent)}
+.cookie-btns{display:flex;gap:8px}
+.ck-btn{font-family:var(--mono);font-size:0.68rem;padding:8px 16px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;letter-spacing:0.06em;transition:all 0.2s}
+.ck-btn:hover{border-color:var(--accent);color:var(--accent)}
+.ck-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.ck-btn.primary:hover{opacity:0.85}
+.cookie.hidden{display:none}
+
+/* LEGAL MODALS */
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:2rem;opacity:0;transition:opacity 0.3s}
+.modal-overlay.active{display:flex;opacity:1}
+.modal{background:var(--bg2);border:1px solid var(--accent);border-radius:2px;max-width:640px;width:100%;max-height:80vh;overflow-y:auto;padding:2.5rem;position:relative;animation:modalIn 0.4s cubic-bezier(0.16,1,0.3,1);box-shadow:0 0 40px rgba(0,240,255,0.1),0 0 4px rgba(0,240,255,0.3)}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:0.7rem;padding:4px 10px;cursor:pointer;font-family:var(--mono);transition:all 0.2s}
+.modal-close:hover{border-color:var(--accent);color:var(--accent)}
+.modal h2{font-family:var(--sans);font-size:1.5rem;font-weight:800;margin-bottom:1.5rem;letter-spacing:-0.02em}
+.modal h3{font-family:var(--sans);font-size:0.95rem;font-weight:700;margin-top:1.5rem;margin-bottom:0.5rem;color:var(--text)}
+.modal p,.modal li{font-size:0.75rem;color:var(--muted);line-height:1.8;margin-bottom:0.75rem}
+.modal ul{padding-left:1.25rem;margin-bottom:1rem}
+.modal li{margin-bottom:0.25rem}
+.modal .highlight{color:var(--accent)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+footer p{font-size:0.66rem;color:var(--muted)}
+footer span{color:var(--accent)}
+.footer-links{display:flex;gap:1rem;flex-wrap:wrap}
+.footer-links a{font-size:0.62rem;color:var(--muted);text-decoration:none;letter-spacing:0.05em;transition:color 0.2s;cursor:pointer}
+.footer-links a:hover{color:var(--accent)}
+
+/* Smooth scroll progress bar */
+.scroll-progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));z-index:9999;width:0%;transition:none}
+
+/* Tilt glow on cards */
+.tilt-glow{position:absolute;width:200px;height:200px;background:radial-gradient(circle,rgba(124,111,255,0.15),transparent 70%);border-radius:50%;pointer-events:none;opacity:0;transition:opacity 0.3s}
+
+@media(max-width:640px){
+  nav{padding:1rem 1.25rem}
+  .hero{padding:7rem 1.25rem 3rem}
+  section{padding:4rem 1.25rem}
+  .certs-grid{grid-template-columns:1fr 1fr}
+  .ji{grid-template-columns:1fr;gap:0.5rem}
+  .ji::before{display:none}
+  footer{flex-direction:column;text-align:center}
+  body{cursor:auto}
+  .cur,.cur-ring{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Scroll progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Particles -->
+<canvas class="particles-canvas" id="particles"></canvas>
+
+<div class="cur" id="cur"></div>
+<div class="cur-ring" id="curRing"></div>
+
+
+
+<!-- COOKIE BANNER -->
+<div class="cookie" id="cookieBanner">
+  <p><span data-i18n="cookie.title">Cookie Notice</span> · <span id="cookieText" data-i18n="cookie.text">This site uses essential cookies for language and theme preferences. No tracking, no third parties.</span></p>
+  <div class="cookie-btns">
+    <button class="ck-btn primary" onclick="acceptCookies()">OK</button>
+    <button class="ck-btn" onclick="openModal('privacyModal')" data-i18n="cookie.more">More Info</button>
+  </div>
+</div>
+
+<!-- PRIVACY POLICY MODAL -->
+<div class="modal-overlay" id="privacyModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('privacyModal')">✕ Close</button>
+    <div id="privacyContent"></div>
+  </div>
+</div>
+
+<!-- IMPRESSUM MODAL -->
+<div class="modal-overlay" id="impressumModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('impressumModal')">✕ Close</button>
+    <div id="impressumContent"></div>
+  </div>
+</div>
+
+<nav id="mainNav">
+  <a href="#" class="logo magnetic">Loot<span>regen</span></a>
+  <div class="nav-r">
+    <div class="lang-btns">
+      <button class="lbtn active" onclick="setLang('en')">EN</button>
+      <button class="lbtn" onclick="setLang('de')">DE</button>
+      <button class="lbtn" onclick="setLang('pl')">PL</button>
+    </div>
+    <button class="tbtn" onclick="toggleTheme()" id="tbtn">☀</button>
+  </div>
+</nav>
+
+<main>
+  <div class="hero">
+    <div class="grid-bg"></div>
+    <div class="glow" id="heroGlow"></div>
+    <div class="hero-inner">
+      <div class="hero-top">
+        <div class="hero-tag" data-i18n="hero.tag">Platform Engineer in Training</div>
+      </div>
+      <h1>
+        <div data-i18n="hero.l1">Building</div>
+        <div class="l2" data-i18n="hero.l2">Platforms</div>
+        <div class="l3" data-i18n="hero.l3">& Pipelines</div>
+      </h1>
+      <p class="hero-desc" data-i18n-html="hero.desc">
+        18-year-old <span>Platform Developer Apprentice</span> from Switzerland, ready to go <span>wherever life takes me</span>. Passionate about Kubernetes, Docker, Terraform and everything infrastructure.
+      </p>
+      <div class="cta-row">
+        <a href="#certs" class="btn btn-p magnetic" data-i18n="hero.cta1">View Certifications</a>
+        <a href="#contact" class="btn btn-o magnetic" data-i18n="hero.cta2">Get In Touch</a>
+      </div>
+      <div class="status-row">
+        <div class="sdot"><span class="dot"></span><span data-i18n="hero.status">Currently studying · LPIC-1 Linux</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="slabel reveal" data-i18n="about.label">About</div>
+    <div class="about-grid">
+      <div class="about-text reveal-left">
+        <h2 data-i18n="about.h2">Who is Lootregen?</h2>
+        <p data-i18n-html="about.p1">An <span>18-year-old</span> Platform Developer Apprentice from Switzerland. I speak German, Polish and English and I build things that run reliably at scale.</p>
+        <p data-i18n-html="about.p2">Currently in my <span>4-year apprenticeship</span>, working towards 8 international certifications and a <span>Platform/DevOps Engineer</span> role <span>wherever the opportunity is</span>.</p>
+        <p data-i18n-html="about.p3">I run a <span>Proxmox homelab</span> with Docker, Cloudflare, self-hosted services and my own domain because the best way to learn is to build for real.</p>
+      </div>
+      <div class="stats-col reveal-right">
+        <div class="si gold">
+          <div class="sn" data-count="AZ-900">AZ-900</div>
+          <div class="sl" data-i18n="about.s0">Certified ✓</div>
+        </div>
+        <div class="si">
+          <div class="sn" data-count-num="8">0</div>
+          <div class="sl" data-i18n="about.s1">Certifications Planned</div>
+        </div>
+        <div class="si">
+          <div class="sn">4yr</div>
+          <div class="sl" data-i18n="about.s2">Apprenticeship · EFZ</div>
+        </div>
+        <div class="si">
+          <div class="sn">Soon</div>
+          <div class="sl" data-i18n="about.s3">Open to Opportunities 🌍</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATIONS -->
+  <section id="certs">
+    <div class="slabel reveal" data-i18n="certs.label">Certifications</div>
+    <div class="certs-grid">
+      <div class="cc reveal-scale" style="border-color:var(--accent3)">
+        <div class="cs next" style="background:rgba(111,255,176,0.12);color:var(--accent3);border-color:rgba(111,255,176,0.2)" data-i18n="certs.done">✓ Done</div>
+        <div class="ci">🔷</div>
+        <div class="cn">AZ-900</div>
+        <div class="cp">Microsoft · Azure Fundamentals</div>
+      </div>
+      <div class="cc in-progress reveal-scale">
+        <div class="cs prog" data-i18n="certs.upnext">Up Next</div>
+        <div class="ci">🐧</div>
+        <div class="cn">LPIC-1</div>
+        <div class="cp">LPI · Linux</div>
+      </div>
+      <div class="cc reveal-scale">
+        <div class="cs plan" data-i18n="certs.plan">Planned</div>
+        <div class="ci">🌐</div>
+        <div class="cn">CCNA</div>
+        <div class="cp">Cisco · Networking</div>
+      </div>
+      <div class="cc reveal-scale">
+        <div class="cs plan" data-i18n="certs.plan">Planned</div>
+        <div class="ci">🐳</div>
+        <div class="cn">Docker DCA</div>
+        <div class="cp">Docker · Containers</div>
+      </div>
+      <div class="cc reveal-scale">
+        <div class="cs plan" data-i18n="certs.plan">Planned</div>
+        <div class="ci">🏗️</div>
+        <div class="cn">Terraform Associate</div>
+        <div class="cp">HashiCorp · IaC</div>
+      </div>
+      <div class="cc reveal-scale">
+        <div class="cs plan" data-i18n="certs.plan">Planned</div>
+        <div class="ci">☸️</div>
+        <div class="cn">CKA</div>
+        <div class="cp">CNCF · Kubernetes</div>
+      </div>
+      <div class="cc reveal-scale">
+        <div class="cs plan" data-i18n="certs.plan">Planned</div>
+        <div class="ci">☁️</div>
+        <div class="cn">AWS Practitioner</div>
+        <div class="cp">Amazon · Cloud</div>
+      </div>
+      <div class="cc reveal-scale">
+        <div class="cs plan" data-i18n="certs.plan">Planned</div>
+        <div class="ci">🔷</div>
+        <div class="cn">AZ-104</div>
+        <div class="cp">Microsoft · Azure Admin</div>
+      </div>
+      <div class="cc reveal-scale">
+        <div class="cs plan" data-i18n="certs.plan">Planned</div>
+        <div class="ci">☁️</div>
+        <div class="cn">AWS Associate</div>
+        <div class="cp">Amazon · Solutions Arch.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section id="stack">
+    <div class="slabel reveal" data-i18n="stack.label">Tech Stack</div>
+    <div class="stack-grid">
+      <!-- OS & Servers -->
+      <div class="stack-cat reveal" data-i18n="stack.os">OS & Servers</div>
+      <div class="stk reveal-scale">Linux</div>
+      <div class="stk reveal-scale">Windows</div>
+      <div class="stk reveal-scale">Windows Server</div>
+      <div class="stk reveal-scale">Ubuntu Server</div>
+
+      <!-- Virtualization & Infrastructure -->
+      <div class="stack-cat reveal" data-i18n="stack.infra">Infrastructure & Virtualization</div>
+      <div class="stk reveal-scale">Proxmox</div>
+      <div class="stk reveal-scale">Hyper-V</div>
+      <div class="stk reveal-scale">Docker</div>
+      <div class="stk reveal-scale">Kubernetes</div>
+      <div class="stk reveal-scale">NAS / Storage</div>
+
+      <!-- Cloud & IaC -->
+      <div class="stack-cat reveal" data-i18n="stack.cloud">Cloud & IaC</div>
+      <div class="stk reveal-scale">AWS</div>
+      <div class="stk reveal-scale">Azure</div>
+      <div class="stk reveal-scale">Cloudflare</div>
+      <div class="stk reveal-scale">Terraform</div>
+
+      <!-- Networking -->
+      <div class="stack-cat reveal" data-i18n="stack.net">Networking</div>
+      <div class="stk reveal-scale">Cisco</div>
+      <div class="stk reveal-scale">Aruba Switches</div>
+      <div class="stk reveal-scale">DNS</div>
+      <div class="stk reveal-scale">DHCP</div>
+      <div class="stk reveal-scale">VPN / Firewall</div>
+
+      <!-- Monitoring -->
+      <div class="stack-cat reveal" data-i18n="stack.monitor">Monitoring</div>
+      <div class="stk reveal-scale">Zabbix</div>
+      <div class="stk reveal-scale">Grafana</div>
+      <div class="stk reveal-scale">UPS Monitoring</div>
+
+      <!-- Scripting & DevOps -->
+      <div class="stack-cat reveal" data-i18n="stack.devops">Scripting & DevOps</div>
+      <div class="stk reveal-scale">Python</div>
+      <div class="stk reveal-scale">HTML / CSS</div>
+      <div class="stk reveal-scale">JavaScript</div>
+      <div class="stk reveal-scale">Bash</div>
+      <div class="stk reveal-scale">PowerShell</div>
+      <div class="stk reveal-scale">SQL</div>
+      <div class="stk reveal-scale">Git</div>
+      <div class="stk reveal-scale">CI/CD</div>
+
+      <!-- Tools & IDEs -->
+      <div class="stack-cat reveal" data-i18n="stack.tools">Tools & IDEs</div>
+      <div class="stk reveal-scale">VS Code</div>
+      <div class="stk reveal-scale">PyCharm</div>
+      <div class="stk reveal-scale">Microsoft Office</div>
+      <div class="stk reveal-scale">Google Workspace</div>
+
+      <!-- AI -->
+      <div class="stack-cat reveal" data-i18n="stack.ai">AI & Automation</div>
+      <div class="stk reveal-scale">ChatGPT</div>
+      <div class="stk reveal-scale">Claude AI</div>
+      <div class="stk reveal-scale">GitHub Copilot</div>
+      <div class="stk reveal-scale">AI Workflows</div>
+
+      <!-- Identity & Services -->
+      <div class="stack-cat reveal" data-i18n="stack.services">Identity & Services</div>
+      <div class="stk reveal-scale">Active Directory</div>
+      <div class="stk reveal-scale">Print Services</div>
+      <div class="stk reveal-scale">OptiSign</div>
+      <div class="stk reveal-scale">App Maintenance</div>
+
+      <!-- Support -->
+      <div class="stack-cat reveal" data-i18n="stack.support">Support</div>
+      <div class="stk reveal-scale">1st/2nd Level</div>
+      <div class="stk reveal-scale">Onsite Support</div>
+      <div class="stk reveal-scale">VIP Support</div>
+    </div>
+  </section>
+
+  <!-- JOURNEY -->
+  <section id="journey">
+    <div class="slabel reveal" data-i18n="journey.label">Journey</div>
+    <div class="journey">
+      <div class="ji reveal">
+        <div class="jd">✓ Done</div>
+        <div class="jc">
+          <h3>AZ-900 Azure Fundamentals</h3>
+          <p>First certification completed. Microsoft Azure Fundamentals. Solid foundation in cloud concepts.</p>
+          <span class="jtag" style="border-color:rgba(111,255,176,0.3);color:var(--accent3)" data-i18n="journey.j0tag">✓ Passed</span>
+        </div>
+      </div>
+      <div class="ji reveal">
+        <div class="jd">2023 · Present</div>
+        <div class="jc">
+          <h3 data-i18n="journey.j1h">Platform Developer Apprenticeship</h3>
+          <p data-i18n="journey.j1p">4-year apprenticeship in Switzerland. Platform development, infrastructure and DevOps from the ground up. Graduating soon.</p>
+          <span class="jtag">EFZ · Switzerland</span>
+        </div>
+      </div>
+      <div class="ji reveal">
+        <div class="jd">2026 · Present</div>
+        <div class="jc">
+          <h3 data-i18n="journey.j2h">8 International Certifications</h3>
+          <p data-i18n="journey.j2p">Intensive self-study alongside apprenticeship. LPIC-1, CCNA, Docker, Terraform, CKA, AWS, Azure. 26 hours per week on KodeKloud.</p>
+          <span class="jtag">KodeKloud · Self-Study</span>
+        </div>
+      </div>
+      <div class="ji reveal">
+        <div class="jd">The Future</div>
+        <div class="jc">
+          <h3 data-i18n="journey.j3h">Wherever Life Takes Me 🌍</h3>
+          <p data-i18n="journey.j3p">Open to Platform/DevOps Engineer roles anywhere in the world. Ready to relocate and grow wherever the best opportunity is.</p>
+          <span class="jtag">Next Chapter</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="slabel reveal" data-i18n="contact.label">Contact</div>
+    <div class="contact-box reveal-scale">
+      <h2 data-i18n="contact.h2">Let's Connect</h2>
+      <p data-i18n="contact.p">Open to Platform/DevOps Engineer opportunities worldwide soon. Always happy to talk infrastructure, Kubernetes or homelab setups.</p>
+      <div class="clinks">
+        <a href="https://github.com/Lootregenit" class="cl magnetic" target="_blank">GitHub</a>
+        <a href="https://www.linkedin.com/in/mateusz-miros%C5%82aw-wo%C5%BAniak-36600b309/" class="cl magnetic" target="_blank">LinkedIn</a>
+        <a href="mailto:info@lootregen.com" class="cl magnetic">Email</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="reveal">
+  <p>© 2026 <span>Lootregen</span> · Platform Engineer</p>
+  <div class="footer-links">
+    <a onclick="openModal('privacyModal')" data-i18n="footer.privacy">Privacy Policy</a>
+    <a onclick="openModal('impressumModal')" data-i18n="footer.impressum">Impressum</a>
+  </div>
+  <p data-i18n-html="footer.built">Self-coded with AI · Hosted on <span>Proxmox + Docker</span> · Cloudflare</p>
+</footer>
+
+<script>
+// ==================== TRANSLATIONS ====================
+const translations={
+  en:{
+    'hero.tag':'Platform Engineer in Training',
+    'hero.l1':'Building','hero.l2':'Platforms','hero.l3':'& Pipelines',
+    'hero.desc':'18-year-old <span>Platform Developer Apprentice</span> from Switzerland, ready to go <span>wherever life takes me</span>. Passionate about Kubernetes, Docker, Terraform and everything infrastructure.',
+    'hero.cta1':'View Certifications','hero.cta2':'Get In Touch',
+    'hero.status':'Currently studying · LPIC-1 Linux',
+    'about.label':'About','about.h2':'Who is Lootregen?',
+    'about.p1':'An <span>18-year-old</span> Platform Developer Apprentice from Switzerland. I speak German, Polish and English and I build things that run reliably at scale.',
+    'about.p2':'Currently in my <span>4-year apprenticeship</span>, working towards 8 international certifications and a <span>Platform/DevOps Engineer</span> role <span>wherever the opportunity is</span>.',
+    'about.p3':'I run a <span>Proxmox homelab</span> with Docker, Cloudflare, self-hosted services and my own domain because the best way to learn is to build for real.',
+    'about.s0':'AZ-900 Certified ✓','about.s1':'Certifications Planned',
+    'about.s2':'Apprenticeship · EFZ','about.s3':'Open to Opportunities 🌍',
+    'certs.label':'Certifications','certs.done':'✓ Done','certs.upnext':'Up Next','certs.plan':'Planned',
+    'stack.label':'Tech Stack',
+    'stack.os':'OS & Servers','stack.infra':'Infrastructure & Virtualization','stack.cloud':'Cloud & IaC','stack.net':'Networking','stack.monitor':'Monitoring','stack.devops':'Scripting & DevOps','stack.tools':'Tools & IDEs','stack.ai':'AI & Automation','stack.services':'Identity & Services','stack.support':'Support',
+    'journey.label':'Journey',
+    'journey.j1h':'Platform Developer Apprenticeship',
+    'journey.j1p':'4-year apprenticeship in Switzerland starting 2023. Platform development, infrastructure and DevOps from the ground up. Graduating soon.',
+    'journey.j2h':'8 International Certifications',
+    'journey.j2p':'Intensive self-study alongside apprenticeship. LPIC-1, CCNA, Docker, Terraform, CKA, AWS, Azure. 26 hours per week on KodeKloud.',
+    'journey.j3h':'Wherever Life Takes Me 🌍',
+    'journey.j3p':'Open to Platform/DevOps Engineer roles anywhere in the world. Ready to relocate and grow wherever the best opportunity is.',
+    'contact.label':'Contact','contact.h2':'Let\'s Connect',
+    'contact.p':'Open to Platform/DevOps Engineer opportunities worldwide soon. Always happy to talk infrastructure, Kubernetes or homelab setups.',
+    'footer.built':'Self-coded with AI · Hosted on <span>Proxmox + Docker</span> · Cloudflare',
+    'footer.privacy':'Privacy Policy',
+    'footer.impressum':'Impressum',
+    'cookie.title':'Cookie Notice',
+    'cookie.text':'This site uses essential cookies for language and theme preferences. No tracking, no third parties.',
+    'cookie.more':'More Info',
+    'journey.j0tag':'✓ Passed',
+  },
+  de:{
+    'hero.tag':'Plattformentwickler in Ausbildung',
+    'hero.l1':'Systeme','hero.l2':'Gebaut','hero.l3':'Für die Zukunft',
+    'hero.desc':'<span>18-jähriger Plattformentwickler-Lernender</span> aus der Schweiz, bereit, dahin zu gehen, <span>wohin das Leben führt</span>. Begeistert von Kubernetes, Docker, Terraform und Infrastruktur.',
+    'hero.cta1':'Zertifikate ansehen','hero.cta2':'Kontakt aufnehmen',
+    'hero.status':'Aktuell lernend · LPIC-1 Linux',
+    'about.label':'Über mich','about.h2':'Wer ist Lootregen?',
+    'about.p1':'Ein <span>18-jähriger</span> Plattformentwickler-Lernender aus der Schweiz. Ich spreche Deutsch, Polnisch und Englisch.',
+    'about.p2':'Aktuell in der <span>4-jährigen Lehre</span>, auf dem Weg zu 8 internationalen Zertifikaten und einer <span>Platform/DevOps Engineer</span> Stelle, <span>wo auch immer die Chance liegt</span>.',
+    'about.p3':'Ich betreibe ein <span>Proxmox Homelab</span> mit Docker, Cloudflare und eigener Domain, denn der beste Weg zu lernen ist selbst zu bauen.',
+    'about.s0':'AZ-900 Bestanden ✓','about.s1':'Geplante Zertifikate',
+    'about.s2':'Lehre · EFZ','about.s3':'Offen für Chancen 🌍',
+    'certs.label':'Zertifikate','certs.done':'✓ Bestanden','certs.upnext':'Als Nächstes','certs.plan':'Geplant',
+    'stack.label':'Tech Stack',
+    'stack.os':'Betriebssysteme & Server','stack.infra':'Infrastruktur & Virtualisierung','stack.cloud':'Cloud & IaC','stack.net':'Netzwerk','stack.monitor':'Monitoring','stack.devops':'Scripting & DevOps','stack.tools':'Tools & IDEs','stack.ai':'KI & Automatisierung','stack.services':'Identität & Dienste','stack.support':'Support',
+    'journey.label':'Mein Weg',
+    'journey.j1h':'Lehre Plattformentwickler',
+    'journey.j1p':'4-jährige Lehre in der Schweiz ab 2023. Plattformentwicklung, Infrastruktur und DevOps. Abschluss in Kürze.',
+    'journey.j2h':'8 Internationale Zertifikate',
+    'journey.j2p':'Intensives Selbststudium neben der Lehre. LPIC-1, CCNA, Docker, Terraform, CKA, AWS, Azure. 26 Stunden/Woche auf KodeKloud.',
+    'journey.j3h':'Wohin das Leben führt 🌍',
+    'journey.j3p':'Offen für Platform/DevOps Engineer Stellen weltweit. Bereit umzuziehen und dort zu wachsen, wo die beste Chance liegt.',
+    'contact.label':'Kontakt','contact.h2':'Kontakt aufnehmen',
+    'contact.p':'Offen für Platform/DevOps Engineer Stellen weltweit bald. Spreche gerne über Infrastruktur, Kubernetes oder Homelab.',
+    'footer.built':'Mit KI selbst erstellt · Gehostet auf <span>Proxmox + Docker</span> · Cloudflare',
+    'footer.privacy':'Datenschutz',
+    'footer.impressum':'Impressum',
+    'cookie.title':'Cookie-Hinweis',
+    'cookie.text':'Diese Seite verwendet essentielle Cookies für Sprach- und Themeeinstellungen. Kein Tracking, keine Drittanbieter.',
+    'cookie.more':'Mehr Infos',
+    'journey.j0tag':'✓ Bestanden',
+  },
+  pl:{
+    'hero.tag':'Inżynier Platform w Trakcie Szkolenia',
+    'hero.l1':'Tworzę','hero.l2':'Systemy','hero.l3':'Przyszłości',
+    'hero.desc':'<span>18-letni praktykant programowania platform</span> ze Szwajcarii, gotowy podążać tam, <span>dokąd zaprowadzi mnie życie</span>. Pasjonuję się Kubernetes, Dockerem, Terraformem i całą infrastrukturą.',
+    'hero.cta1':'Certyfikaty','hero.cta2':'Kontakt',
+    'hero.status':'Obecnie uczę się · LPIC-1 Linux',
+    'about.label':'O mnie','about.h2':'Kim jest Lootregen?',
+    'about.p1':'<span>18-letni</span> praktykant programowania platform ze Szwajcarii. Mówię po niemiecku, polsku i angielsku i buduję rzeczy, które działają niezawodnie na dużą skalę.',
+    'about.p2':'Jestem w trakcie <span>4-letniej praktyki zawodowej</span>. Dążę do zdobycia 8 międzynarodowych certyfikatów i pracy jako <span>Platform/DevOps Engineer</span> <span>tam, gdzie pojawi się najlepsza szansa</span>.',
+    'about.p3':'Prowadzę własny <span>homelab na Proxmox</span> z Dockerem, Cloudflare i własną domeną, bo najlepiej uczyć się przez budowanie.',
+    'about.s0':'AZ-900 Zdany ✓','about.s1':'Planowanych certyfikatów',
+    'about.s2':'Praktyka · EFZ','about.s3':'Otwarty na możliwości 🌍',
+    'certs.label':'Certyfikaty','certs.done':'✓ Zdany','certs.upnext':'W trakcie','certs.plan':'Planowany',
+    'stack.label':'Technologie',
+    'stack.os':'Systemy i serwery','stack.infra':'Infrastruktura i wirtualizacja','stack.cloud':'Chmura i IaC','stack.net':'Sieć','stack.monitor':'Monitoring','stack.devops':'Skrypty i DevOps','stack.tools':'Narzędzia i IDE','stack.ai':'AI i automatyzacja','stack.services':'Tożsamość i usługi','stack.support':'Wsparcie',
+    'journey.label':'Moja droga',
+    'journey.j1h':'Praktyka · Programista Platform',
+    'journey.j1p':'4-letnia praktyka zawodowa w Szwajcarii od 2023 roku. Programowanie platform, infrastruktura i DevOps od podstaw. Zakończenie wkrótce.',
+    'journey.j2h':'8 międzynarodowych certyfikatów',
+    'journey.j2p':'Intensywna nauka własna równolegle z praktyką. LPIC-1, CCNA, Docker, Terraform, CKA, AWS, Azure. 26 godzin tygodniowo na KodeKloud.',
+    'journey.j3h':'Dokąd zaprowadzi życie 🌍',
+    'journey.j3p':'Otwarty na stanowiska Platform/DevOps Engineer na całym świecie. Gotowy do przeprowadzki i rozwoju tam, gdzie pojawi się najlepsza szansa.',
+    'contact.label':'Kontakt','contact.h2':'Porozmawiajmy',
+    'contact.p':'Jestem otwarty na oferty pracy jako Platform/DevOps Engineer na całym świecie wkrótce. Chętnie porozmawiam o infrastrukturze, Kubernetes lub homelabowych projektach.',
+    'footer.built':'Napisany własnoręcznie · Hostowany na <span>Proxmox + Docker</span> · Cloudflare',
+    'footer.privacy':'Polityka prywatności',
+    'footer.impressum':'Impressum',
+    'cookie.title':'Pliki cookie',
+    'cookie.text':'Ta strona używa wyłącznie niezbędnych plików cookie do zapamiętania preferencji języka i motywu. Brak śledzenia, brak stron trzecich.',
+    'cookie.more':'Więcej',
+    'journey.j0tag':'✓ Zdany',
+  }
+};
+
+// ==================== CORE FUNCTIONS ====================
+function toggleTheme(){
+  const h=document.documentElement;
+  const d=h.getAttribute('data-theme')==='dark';
+  h.setAttribute('data-theme',d?'light':'dark');
+  document.getElementById('tbtn').textContent=d?'☽':'☀';
+}
+function setLang(lang){
+  currentLang=lang;
+  document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.lbtn').forEach(b=>{if(b.textContent===lang.toUpperCase())b.classList.add('active')});
+  const tr=translations[lang];if(!tr)return;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(tr[k])el.textContent=tr[k]});
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{const k=el.getAttribute('data-i18n-html');if(tr[k])el.innerHTML=tr[k]});
+  updateLegalContent();
+}
+
+// ==================== COOKIES & MODALS ====================
+let currentLang='en';
+function acceptCookies(){document.getElementById('cookieBanner').classList.add('hidden')}
+function openModal(id){
+  const m=document.getElementById(id);
+  m.style.display='flex';
+  requestAnimationFrame(()=>m.classList.add('active'));
+  document.body.style.overflow='hidden';
+  updateLegalContent();
+}
+function closeModal(id){
+  const m=document.getElementById(id);
+  m.classList.remove('active');
+  setTimeout(()=>{m.style.display='none';document.body.style.overflow=''},300);
+}
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)});
+});
+// Close on ESC
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.querySelectorAll('.modal-overlay.active').forEach(m=>closeModal(m.id));
+});
+
+// ==================== LEGAL CONTENT ====================
+const legalContent={
+  en:{
+    privacy:`
+      <h2>Privacy Policy</h2>
+      <h3>1. Overview</h3>
+      <p>This website is operated by Mateusz Mirosław Woźniak ("Lootregen") and hosted in Switzerland. Your privacy is important to me. This policy explains what data is collected and how it is used.</p>
+      <h3>2. Data Collected</h3>
+      <p>This site uses <span class="highlight">only essential cookies</span> to store your language preference and theme selection (dark/light mode). No personal data is collected, stored, or processed beyond this.</p>
+      <h3>3. No Tracking</h3>
+      <p>This site does not use any analytics, tracking pixels, advertising scripts, or third-party cookies. No data is shared with third parties.</p>
+      <h3>4. Hosting</h3>
+      <p>This site is self-hosted on a personal <span class="highlight">Proxmox server</span> in Switzerland, behind Cloudflare for DNS and DDoS protection. Cloudflare may process connection metadata (IP address, request headers) according to their own privacy policy.</p>
+      <h3>5. Your Rights</h3>
+      <p>Under the Swiss Federal Act on Data Protection (nDSG) and EU GDPR, you have the right to request information about any personal data stored, request deletion, and lodge a complaint with a supervisory authority.</p>
+      <h3>6. Contact</h3>
+      <p>For privacy questions, contact me via the links on this site.</p>
+      <p><em>Last updated: April 2026</em></p>
+    `,
+    impressum:`
+      <h2>Impressum</h2>
+      <h3>Responsible Person</h3>
+      <p><strong>Mateusz Mirosław Woźniak</strong><br>
+      (known as "Lootregen")<br>
+      Switzerland</p>
+      <h3>Contact</h3>
+      <p>GitHub: <a href="https://github.com/Lootregenit" target="_blank" style="color:var(--accent)">github.com/Lootregenit</a><br>
+      LinkedIn: <a href="https://www.linkedin.com/in/mateusz-miros%C5%82aw-wo%C5%BAniak-36600b309/" target="_blank" style="color:var(--accent)">Mateusz M. Woźniak</a></p>
+      <h3>Hosting</h3>
+      <p>Self-hosted on Proxmox · Switzerland<br>
+      DNS & CDN: Cloudflare, Inc.</p>
+      <h3>Disclaimer</h3>
+      <p>The content of this website is created with care. However, no guarantee is made for the accuracy, completeness, or timeliness of the content. Liability for linked external websites lies solely with their respective operators.</p>
+      <p><em>Last updated: April 2026</em></p>
+    `
+  },
+  de:{
+    privacy:`
+      <h2>Datenschutzerklärung</h2>
+      <h3>1. Übersicht</h3>
+      <p>Diese Website wird von Mateusz Mirosław Woźniak ("Lootregen") betrieben und in der Schweiz gehostet. Ihre Privatsphäre ist mir wichtig. Diese Richtlinie erklärt, welche Daten erfasst und wie sie verwendet werden.</p>
+      <h3>2. Erfasste Daten</h3>
+      <p>Diese Seite verwendet <span class="highlight">nur essentielle Cookies</span> zur Speicherung Ihrer Sprachpräferenz und Theme-Auswahl (Dunkel-/Hellmodus). Es werden keine personenbezogenen Daten darüber hinaus erfasst, gespeichert oder verarbeitet.</p>
+      <h3>3. Kein Tracking</h3>
+      <p>Diese Seite verwendet keine Analyse-Tools, Tracking-Pixel, Werbeskripte oder Drittanbieter-Cookies. Es werden keine Daten an Dritte weitergegeben.</p>
+      <h3>4. Hosting</h3>
+      <p>Diese Seite wird auf einem privaten <span class="highlight">Proxmox-Server</span> in der Schweiz selbst gehostet, hinter Cloudflare für DNS und DDoS-Schutz. Cloudflare kann Verbindungsmetadaten gemäß ihrer eigenen Datenschutzerklärung verarbeiten.</p>
+      <h3>5. Ihre Rechte</h3>
+      <p>Gemäß dem Schweizer Datenschutzgesetz (nDSG) und der EU-DSGVO haben Sie das Recht, Auskunft über gespeicherte personenbezogene Daten zu verlangen, deren Löschung zu beantragen und Beschwerde bei einer Aufsichtsbehörde einzulegen.</p>
+      <h3>6. Kontakt</h3>
+      <p>Für Datenschutzfragen kontaktieren Sie mich über die Links auf dieser Seite.</p>
+      <p><em>Letzte Aktualisierung: April 2026</em></p>
+    `,
+    impressum:`
+      <h2>Impressum</h2>
+      <h3>Verantwortliche Person</h3>
+      <p><strong>Mateusz Mirosław Woźniak</strong><br>
+      (bekannt als "Lootregen")<br>
+      Schweiz</p>
+      <h3>Kontakt</h3>
+      <p>GitHub: <a href="https://github.com/Lootregenit" target="_blank" style="color:var(--accent)">github.com/Lootregenit</a><br>
+      LinkedIn: <a href="https://www.linkedin.com/in/mateusz-miros%C5%82aw-wo%C5%BAniak-36600b309/" target="_blank" style="color:var(--accent)">Mateusz M. Woźniak</a></p>
+      <h3>Hosting</h3>
+      <p>Selbst gehostet auf Proxmox · Schweiz<br>
+      DNS & CDN: Cloudflare, Inc.</p>
+      <h3>Haftungsausschluss</h3>
+      <p>Die Inhalte dieser Website werden mit Sorgfalt erstellt. Es wird jedoch keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität übernommen. Für verlinkte externe Websites haften ausschließlich deren Betreiber.</p>
+      <p><em>Letzte Aktualisierung: April 2026</em></p>
+    `
+  },
+  pl:{
+    privacy:`
+      <h2>Polityka prywatności</h2>
+      <h3>1. Informacje ogólne</h3>
+      <p>Ta strona jest prowadzona przez Mateusza Mirosława Woźniaka („Lootregen") i hostowana w Szwajcarii. Twoja prywatność jest dla mnie ważna. Niniejsza polityka wyjaśnia, jakie dane są zbierane i w jaki sposób są wykorzystywane.</p>
+      <h3>2. Zbierane dane</h3>
+      <p>Ta strona używa <span class="highlight">wyłącznie niezbędnych plików cookie</span> do zapisania preferencji językowych oraz wybranego motywu (ciemny/jasny). Żadne dane osobowe nie są zbierane, przechowywane ani przetwarzane poza tym zakresem.</p>
+      <h3>3. Brak śledzenia</h3>
+      <p>Ta strona nie korzysta z żadnych narzędzi analitycznych, pikseli śledzących, skryptów reklamowych ani plików cookie stron trzecich. Żadne dane nie są udostępniane podmiotom trzecim.</p>
+      <h3>4. Hosting</h3>
+      <p>Strona jest hostowana samodzielnie na prywatnym serwerze <span class="highlight">Proxmox</span> w Szwajcarii, za usługą Cloudflare zapewniającą DNS i ochronę DDoS. Cloudflare może przetwarzać metadane połączeń zgodnie ze swoją polityką prywatności.</p>
+      <h3>5. Twoje prawa</h3>
+      <p>Zgodnie ze szwajcarską ustawą o ochronie danych (nDSG) oraz unijnym rozporządzeniem RODO masz prawo do uzyskania informacji o przechowywanych danych osobowych, żądania ich usunięcia oraz złożenia skargi do właściwego organu nadzorczego.</p>
+      <h3>6. Kontakt</h3>
+      <p>W sprawach dotyczących prywatności skontaktuj się ze mną za pośrednictwem linków na tej stronie.</p>
+      <p><em>Ostatnia aktualizacja: kwiecień 2026</em></p>
+    `,
+    impressum:`
+      <h2>Impressum</h2>
+      <h3>Osoba odpowiedzialna</h3>
+      <p><strong>Mateusz Mirosław Woźniak</strong><br>
+      (znany jako „Lootregen")<br>
+      Szwajcaria</p>
+      <h3>Kontakt</h3>
+      <p>GitHub: <a href="https://github.com/Lootregenit" target="_blank" style="color:var(--accent)">github.com/Lootregenit</a><br>
+      LinkedIn: <a href="https://www.linkedin.com/in/mateusz-miros%C5%82aw-wo%C5%BAniak-36600b309/" target="_blank" style="color:var(--accent)">Mateusz M. Woźniak</a></p>
+      <h3>Hosting</h3>
+      <p>Samodzielny hosting na Proxmox · Szwajcaria<br>
+      DNS i CDN: Cloudflare, Inc.</p>
+      <h3>Wyłączenie odpowiedzialności</h3>
+      <p>Treści zamieszczone na tej stronie zostały przygotowane z należytą starannością. Nie udziela się jednak gwarancji co do ich dokładności, kompletności ani aktualności. Za treści zamieszczone na stronach zewnętrznych, do których prowadzą linki, odpowiadają wyłącznie ich operatorzy.</p>
+      <p><em>Ostatnia aktualizacja: kwiecień 2026</em></p>
+    `
+  }
+};
+
+function updateLegalContent(){
+  const lang=currentLang||'en';
+  const c=legalContent[lang]||legalContent.en;
+  document.getElementById('privacyContent').innerHTML=c.privacy;
+  document.getElementById('impressumContent').innerHTML=c.impressum;
+}
+
+// ==================== CUSTOM CURSOR ====================
+const cur=document.getElementById('cur');
+const ring=document.getElementById('curRing');
+let mouseX=0,mouseY=0,ringX=0,ringY=0;
+
+document.addEventListener('mousemove',e=>{
+  mouseX=e.clientX;mouseY=e.clientY;
+  cur.style.left=mouseX+'px';cur.style.top=mouseY+'px';
+});
+// Smooth ring follow
+function animateRing(){
+  ringX+=(mouseX-ringX)*0.12;
+  ringY+=(mouseY-ringY)*0.12;
+  ring.style.left=ringX+'px';ring.style.top=ringY+'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+// Cursor hover effect on interactive elements
+document.querySelectorAll('a,button,.cc,.stk,.si').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.classList.add('hover');ring.classList.add('hover')});
+  el.addEventListener('mouseleave',()=>{cur.classList.remove('hover');ring.classList.remove('hover')});
+});
+
+// ==================== PARTICLES ====================
+(function(){
+  const canvas=document.getElementById('particles');
+  const ctx=canvas.getContext('2d');
+  let w,h,particles=[];
+
+  function resize(){w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight}
+  resize();
+  window.addEventListener('resize',resize);
+
+  class Particle{
+    constructor(){this.reset()}
+    reset(){
+      this.x=Math.random()*w;
+      this.y=Math.random()*h;
+      this.size=Math.random()*1.5+0.5;
+      this.speedX=(Math.random()-0.5)*0.3;
+      this.speedY=(Math.random()-0.5)*0.3;
+      this.opacity=Math.random()*0.5+0.1;
+    }
+    update(){
+      this.x+=this.speedX;this.y+=this.speedY;
+      if(this.x<0||this.x>w||this.y<0||this.y>h)this.reset();
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,240,255,${this.opacity})`;
+      ctx.fill();
+    }
+  }
+
+  for(let i=0;i<60;i++)particles.push(new Particle());
+
+  function drawLines(){
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x;
+        const dy=particles[i].y-particles[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<120){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle=`rgba(0,240,255,${0.06*(1-dist/120)})`;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function animate(){
+    ctx.clearRect(0,0,w,h);
+    particles.forEach(p=>{p.update();p.draw()});
+    drawLines();
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// ==================== HERO PARALLAX GLOW ====================
+const heroGlow=document.getElementById('heroGlow');
+document.querySelector('.hero').addEventListener('mousemove',e=>{
+  const rect=e.currentTarget.getBoundingClientRect();
+  const x=((e.clientX-rect.left)/rect.width-0.5)*60;
+  const y=((e.clientY-rect.top)/rect.height-0.5)*60;
+  heroGlow.style.transform=`translate(${x}px,${y}px)`;
+});
+
+// ==================== SCROLL PROGRESS BAR ====================
+const scrollBar=document.getElementById('scrollProgress');
+window.addEventListener('scroll',()=>{
+  const scrollTop=document.documentElement.scrollTop;
+  const scrollHeight=document.documentElement.scrollHeight-window.innerHeight;
+  scrollBar.style.width=(scrollTop/scrollHeight*100)+'%';
+});
+
+// ==================== SMART NAV HIDE/SHOW ====================
+let lastScroll=0;
+const nav=document.getElementById('mainNav');
+window.addEventListener('scroll',()=>{
+  const st=window.scrollY;
+  if(st>80)nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
+  if(st>lastScroll&&st>200)nav.classList.add('nav-hidden');
+  else nav.classList.remove('nav-hidden');
+  lastScroll=st;
+});
+
+// ==================== SCROLL REVEAL ====================
+const revealEls=document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale');
+const revealObserver=new IntersectionObserver((entries)=>{
+  entries.forEach((entry,i)=>{
+    if(entry.isIntersecting){
+      // Stagger children of same parent
+      const parent=entry.target.parentElement;
+      const siblings=[...parent.children].filter(c=>c.classList.contains('reveal-scale')||c.classList.contains('reveal'));
+      const idx=siblings.indexOf(entry.target);
+      const delay=idx>=0?idx*80:0;
+      setTimeout(()=>entry.target.classList.add('visible'),delay);
+      revealObserver.unobserve(entry.target);
+    }
+  });
+},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+revealEls.forEach(el=>revealObserver.observe(el));
+
+// ==================== NUMBER COUNTER ====================
+const counterEls=document.querySelectorAll('[data-count-num]');
+const counterObserver=new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const el=entry.target;
+      const target=parseInt(el.dataset.countNum);
+      const duration=1200;
+      const start=performance.now();
+      function tick(now){
+        const progress=Math.min((now-start)/duration,1);
+        const eased=1-Math.pow(1-progress,3); // ease-out cubic
+        el.textContent=Math.round(eased*target);
+        if(progress<1)requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+      counterObserver.unobserve(el);
+    }
+  });
+},{threshold:0.5});
+counterEls.forEach(el=>counterObserver.observe(el));
+
+// ==================== MAGNETIC BUTTONS ====================
+document.querySelectorAll('.magnetic').forEach(el=>{
+  el.addEventListener('mousemove',e=>{
+    const rect=el.getBoundingClientRect();
+    const x=e.clientX-rect.left-rect.width/2;
+    const y=e.clientY-rect.top-rect.height/2;
+    el.style.transform=`translate(${x*0.2}px,${y*0.2}px)`;
+  });
+  el.addEventListener('mouseleave',()=>{el.style.transform=''});
+});
+
+// ==================== TILT ON CERT CARDS ====================
+document.querySelectorAll('.cc').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const rect=card.getBoundingClientRect();
+    const x=(e.clientX-rect.left)/rect.width;
+    const y=(e.clientY-rect.top)/rect.height;
+    const rotX=(y-0.5)*8;
+    const rotY=(x-0.5)*-8;
+    card.style.transform=`perspective(600px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-6px)`;
+  });
+  card.addEventListener('mouseleave',()=>{
+    card.style.transform='';
+  });
+});
+
+// ==================== SMOOTH SECTION ANCHOR SCROLL ====================
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const target=document.querySelector(a.getAttribute('href'));
+    if(target){
+      e.preventDefault();
+      target.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  });
+});
+
+// Init legal content on load
+updateLegalContent();
+</script>
+</body>
+</html>

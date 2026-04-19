@@ -1,0 +1,29 @@
+# Never commit secrets
+*.secret
+*.token
+.env
+.env.*
+!.env.example
+
+# Local kubeconfig
+kubeconfig
+*.kubeconfig
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backup files
+*.bak
+*.tmp
+
+# Webpage build artifacts (if you add a build step later)
+webpage/node_modules/
+webpage/dist/
