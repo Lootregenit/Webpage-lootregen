@@ -1520,19 +1520,19 @@ footer span{color:var(--cyan)}
 
 <!-- HOMELAB -->
 <section class="section reveal" id="homelab">
-  <div class="section-label">// Physical Infrastructure Registry</div>
-  <h2 class="section-title"><span>Homelab</span></h2>
-  <p class="section-sub">Single-node. Real infrastructure. Built to learn.</p>
+  <div class="section-label" data-i18n="homelab.label">// Physical Infrastructure Registry</div>
+  <h2 class="section-title"><span data-i18n="homelab.title">Homelab</span></h2>
+  <p class="section-sub" data-i18n="homelab.sub">Single-node. Real infrastructure. Built to learn.</p>
 
   <div class="homelab-grid">
 
     <div class="homelab-body">
-      <p>My homelab runs on a single <span class="hl">Proxmox node</span> — an Intel Core i7 11th Gen laptop with 32GB RAM, kept online 24/7 with the lid closed. It's where I test everything before it ever touches production.</p>
-      <p>Alongside it sits a <span class="hl">self-built NAS</span> (Intel N100, 8GB DDR5) handling local storage and backups via Proxmox Backup Server. All traffic goes through <span class="hl">Cloudflare</span> for DNS, CDN, and DDoS protection — this website included.</p>
-      <p>Services run in <span class="hl">Docker inside LXC containers</span> and VMs, managed and snapshotted directly from the Proxmox web UI. The entire setup is a single-host solution for now, with plans to expand into a <span class="hl">multi-node cluster</span> and add Kubernetes (K3s) as the lab grows.</p>
-      <p>This site is <span class="hl">self-hosted here</span>. No cloud provider, no managed hosting — just my own hardware in Switzerland.</p>
+      <p data-i18n-html="homelab.p1">My homelab runs on a single <span class="hl">Proxmox node</span>. an Intel Core i7 11th Gen laptop with 32GB RAM, kept online 24/7 with the lid closed. It's where I test everything before it ever touches production.</p>
+      <p data-i18n-html="homelab.p2">Alongside it sits a <span class="hl">self-built NAS</span> (Intel N100, 8GB DDR5) handling local storage and backups via Proxmox Backup Server. All traffic goes through <span class="hl">Cloudflare</span> for DNS, CDN, and DDoS protection. this website included.</p>
+      <p data-i18n-html="homelab.p3">Services run in <span class="hl">Docker inside LXC containers</span> and VMs, managed and snapshotted directly from the Proxmox web UI. The entire setup is a single-host solution for now, with plans to expand into a <span class="hl">multi-node cluster</span> and add Kubernetes (K3s) as the lab grows.</p>
+      <p data-i18n-html="homelab.p4">This site is <span class="hl">self-hosted here</span>. No cloud provider, no managed hosting. just my own hardware in Switzerland.</p>
 
-      <a href="https://github.com/Lootregenit" class="homelab-cta" target="_blank">→ Follow the progress on GitHub</a>
+      <a href="https://github.com/Lootregenit" class="homelab-cta" target="_blank" data-i18n="homelab.cta">→ Follow the progress on GitHub</a>
 
       <div class="homelab-badges">
         <span class="hbadge">Proxmox VE</span>
@@ -1742,69 +1742,87 @@ applyThemeVars(savedTheme);
 // ══════════════════════════════════════
 const translations = {
   en:{
-    'nav.implants':'Neural Implants','nav.contracts':'Contracts','nav.skilltree':'Skill Tree','nav.homelab':'Homelab','nav.contact':'Contact',
+    'nav.implants':'Neural Implants','nav.contracts':'Certifications','nav.skilltree':'Skill Tree','nav.homelab':'Homelab','nav.contact':'Contact',
     'hero.tag':'Platform Engineer · Night City Division · Switzerland',
     'hero.l1':'Building','hero.l2':'Platforms','hero.l3':'& Pipelines',
     'hero.desc':'18-year-old <span>Platform Developer Apprentice</span> from Switzerland. Proxmox homelabber, cert grinder, future DevOps nomad. Ready to go wherever the <span>best contract is</span>.',
-    'hero.cta1':'View Contracts','hero.cta2':'Open Comms',
+    'hero.cta1':'Certifications','hero.cta2':'Open Comms',
     'hero.status':'DUAL ACTIVE: Linux LFCS + Docker DCA · KodeKloud · April 2026',
     'about.label':'// Identity Module','about.h2':'Who is Lootregen?',
     'about.p1':'An <span>18-year-old</span> Platform Developer Apprentice from Switzerland. I speak German, Polish and English and I build things that run reliably at scale.',
     'about.p2':'Currently in my <span>4-year apprenticeship (EFZ)</span>, grinding through international certifications on <span>KodeKloud</span> alongside real hands-on practice labs.',
-    'about.p3':'I run a <span>Proxmox homelab</span> with Docker, Cloudflare, self-hosted services and my own domain — because the best way to learn is to build for real.',
+    'about.p3':'I run a <span>Proxmox homelab</span> with Docker, Cloudflare, self-hosted services and my own domain. because the best way to learn is to build for real.',
     'about.s0':'First Contract Fulfilled ✓','about.s1':'Certifications Targeted',
     'about.s2':'Apprenticeship · EFZ · Switzerland','about.s3':'To Relocation & Opportunities 🌍',
-    'implants.label':'// Cybernetic Enhancement Registry','implants.title':'Neural Implants','implants.sub':'Tech stack — installed augmentations and active firmware',
+    'implants.label':'// Cybernetic Enhancement Registry','implants.title':'Neural Implants','implants.sub':'Tech stack. installed augmentations and active firmware',
     'stack.os':'OS & Servers','stack.infra':'Infrastructure & Virtualization','stack.cloud':'Cloud & IaC','stack.net':'Networking','stack.devops':'Scripting & DevOps','stack.monitor':'Monitoring & Identity',
-    'contracts.label':'// Witcher Notice Board','contracts.title':'Certifications','contracts.sub':'Certifications — fulfilled, active and queued',
+    'contracts.label':'// Witcher Notice Board','contracts.title':'Certifications','contracts.sub':'Certifications. fulfilled, active and queued',
     'certs.done':'Contract Fulfilled','certs.now':'👉 Active Now','certs.queued':'🔜 Queued','certs.optional':'🔜 Optional','certs.az900date':'Completed · 2024',
-    'tree.label':'// Neural-Link Skill Matrix','tree.title':'Skill Tree','tree.sub':'Active nodes pulsing — planned nodes await data upload',
+    'tree.label':'// Neural-Link Skill Matrix','tree.title':'Skill Tree','tree.sub':'Active nodes pulsing. planned nodes await data upload',
+    'homelab.label':'// Physical Infrastructure Registry','homelab.title':'Homelab','homelab.sub':'Single-node. Real infrastructure. Built to learn.',
+    'homelab.p1':'My homelab runs on a single <span class="hl">Proxmox node</span>. an Intel Core i7 11th Gen laptop with 32GB RAM, kept online 24/7 with the lid closed. It\'s where I test everything before it ever touches production.',
+    'homelab.p2':'Alongside it sits a <span class="hl">self-built NAS</span> (Intel N100, 8GB DDR5) handling local storage and backups via Proxmox Backup Server. All traffic goes through <span class="hl">Cloudflare</span> for DNS, CDN, and DDoS protection. this website included.',
+    'homelab.p3':'Services run in <span class="hl">Docker inside LXC containers</span> and VMs, managed and snapshotted directly from the Proxmox web UI. The entire setup is a single-host solution for now, with plans to expand into a <span class="hl">multi-node cluster</span> and add Kubernetes (K3s) as the lab grows.',
+    'homelab.p4':'This site is <span class="hl">self-hosted here</span>. No cloud provider, no managed hosting. just my own hardware in Switzerland.',
+    'homelab.cta':'→ Follow the progress on GitHub',
     'contact.label':'// Open Comms Channel','contact.h2':'Let\'s Connect',
     'contact.p':'Open to Platform/DevOps Engineer contracts worldwide. Always happy to talk infrastructure, Kubernetes or homelab setups.',
     'footer.privacy':'Privacy Policy','footer.impressum':'Impressum',
     'footer.built':'Self-coded with AI · Hosted on <span>Proxmox + K3s</span> · Cloudflare',
   },
   de:{
-    'nav.implants':'Neuronale Implantate','nav.contracts':'Verträge','nav.skilltree':'Skilltree','nav.homelab':'Homelab','nav.contact':'Kontakt',
+    'nav.implants':'Neuronale Implantate','nav.contracts':'Zertifikate','nav.skilltree':'Skilltree','nav.homelab':'Homelab','nav.contact':'Kontakt',
     'hero.tag':'Plattformentwickler · Night City Division · Schweiz',
     'hero.l1':'Systeme','hero.l2':'Gebaut','hero.l3':'Für die Zukunft',
     'hero.desc':'<span>18-jähriger Plattformentwickler-Lernender</span> aus der Schweiz. Proxmox Homelabber, Zertifikat-Grinder, zukünftiger DevOps-Nomad. Bereit dahin zu gehen, wo der <span>beste Auftrag wartet</span>.',
-    'hero.cta1':'Verträge ansehen','hero.cta2':'Kontakt öffnen',
+    'hero.cta1':'Zertifikate','hero.cta2':'Kontakt öffnen',
     'hero.status':'DUAL AKTIV: Linux LFCS + Docker DCA · KodeKloud · April 2026',
     'about.label':'// Identitätsmodul','about.h2':'Wer ist Lootregen?',
     'about.p1':'Ein <span>18-jähriger</span> Plattformentwickler-Lernender aus der Schweiz. Ich spreche Deutsch, Polnisch und Englisch.',
     'about.p2':'Aktuell in der <span>4-jährigen Lehre (EFZ)</span>, mit intensivem Selbststudium auf <span>KodeKloud</span> und echten Praxislaboren.',
-    'about.p3':'Ich betreibe ein <span>Proxmox Homelab</span> mit Docker, Cloudflare und eigener Domain — denn der beste Weg zu lernen ist selbst zu bauen.',
+    'about.p3':'Ich betreibe ein <span>Proxmox Homelab</span> mit Docker, Cloudflare und eigener Domain. denn der beste Weg zu lernen ist selbst zu bauen.',
     'about.s0':'Erster Vertrag erfüllt ✓','about.s1':'Geplante Zertifikate',
     'about.s2':'Lehre · EFZ · Schweiz','about.s3':'Offen für Möglichkeiten 🌍',
-    'implants.label':'// Kybernetik-Erweiterungsregister','implants.title':'Neuronale Implantate','implants.sub':'Tech-Stack — installierte Augmentierungen und aktive Firmware',
+    'implants.label':'// Kybernetik-Erweiterungsregister','implants.title':'Neuronale Implantate','implants.sub':'Tech-Stack. installierte Augmentierungen und aktive Firmware',
     'stack.os':'Betriebssysteme & Server','stack.infra':'Infrastruktur & Virtualisierung','stack.cloud':'Cloud & IaC','stack.net':'Netzwerk','stack.devops':'Scripting & DevOps','stack.monitor':'Monitoring & Identität',
-    'contracts.label':'// Hexer Schwarzes Brett','contracts.title':'Zertifikate','contracts.sub':'Zertifikate — erfüllt, aktiv und in Warteschlange',
+    'contracts.label':'// Hexer Schwarzes Brett','contracts.title':'Zertifikate','contracts.sub':'Zertifikate. erfüllt, aktiv und in Warteschlange',
     'certs.done':'Vertrag erfüllt','certs.now':'👉 Aktiv jetzt','certs.queued':'🔜 In Warteschlange','certs.optional':'🔜 Optional','certs.az900date':'Abgeschlossen · 2024',
-    'tree.label':'// Neural-Link Skill-Matrix','tree.title':'Skill-Baum','tree.sub':'Aktive Knoten pulsieren — geplante warten auf Daten-Upload',
+    'tree.label':'// Neural-Link Skill-Matrix','tree.title':'Skill-Baum','tree.sub':'Aktive Knoten pulsieren. geplante warten auf Daten-Upload',
+    'homelab.label':'// Physisches Infrastruktur-Register','homelab.title':'Homelab','homelab.sub':'Einzelknoten. Echte Infrastruktur. Zum Lernen gebaut.',
+    'homelab.p1':'Mein Homelab läuft auf einem einzelnen <span class="hl">Proxmox-Knoten</span>. einem Intel Core i7 11. Gen Laptop mit 32 GB RAM, der 24/7 mit geschlossenem Deckel läuft. Hier teste ich alles, bevor es in die Produktion geht.',
+    'homelab.p2':'Daneben steht ein <span class="hl">selbst gebautes NAS</span> (Intel N100, 8 GB DDR5) für lokalen Speicher und Backups via Proxmox Backup Server. Der gesamte Traffic läuft über <span class="hl">Cloudflare</span> für DNS, CDN und DDoS-Schutz. diese Website eingeschlossen.',
+    'homelab.p3':'Dienste laufen in <span class="hl">Docker innerhalb von LXC-Containern</span> und VMs, verwaltet direkt aus der Proxmox Web-UI. Das Setup ist vorerst ein Single-Host, mit Plänen für einen <span class="hl">Multi-Node-Cluster</span> und Kubernetes (K3s).',
+    'homelab.p4':'Diese Seite ist <span class="hl">hier selbst gehostet</span>. Kein Cloud-Anbieter, kein Managed Hosting. nur meine eigene Hardware in der Schweiz.',
+    'homelab.cta':'→ Fortschritt auf GitHub verfolgen',
     'contact.label':'// Kommunikationskanal öffnen','contact.h2':'Kontakt aufnehmen',
     'contact.p':'Offen für Platform/DevOps Engineer Stellen weltweit. Spreche gerne über Infrastruktur, Kubernetes oder Homelab.',
     'footer.privacy':'Datenschutz','footer.impressum':'Impressum',
     'footer.built':'Mit KI selbst erstellt · Gehostet auf <span>Proxmox + K3s</span> · Cloudflare',
   },
   pl:{
-    'nav.implants':'Implanty Neuronalne','nav.contracts':'Kontrakty','nav.skilltree':'Drzewo Umiejętności','nav.homelab':'Homelab','nav.contact':'Kontakt',
+    'nav.implants':'Implanty Neuronalne','nav.contracts':'Certyfikaty','nav.skilltree':'Drzewo Umiejętności','nav.homelab':'Homelab','nav.contact':'Kontakt',
     'hero.tag':'Inżynier Platform · Dywizja Night City · Szwajcaria',
     'hero.l1':'Tworzę','hero.l2':'Systemy','hero.l3':'Przyszłości',
     'hero.desc':'<span>18-letni praktykant programowania platform</span> ze Szwajcarii. Homelabber na Proxmox, kolekcjoner certyfikatów, przyszły nomad DevOps. Gotowy podążać tam, gdzie <span>najlepszy kontrakt</span>.',
-    'hero.cta1':'Kontrakty','hero.cta2':'Otwórz komm',
+    'hero.cta1':'Certyfikaty','hero.cta2':'Otwórz komm',
     'hero.status':'DUAL AKTYWNY: Linux LFCS + Docker DCA · KodeKloud · Kwiecień 2026',
     'about.label':'// Moduł Tożsamości','about.h2':'Kim jest Lootregen?',
     'about.p1':'<span>18-letni</span> praktykant programowania platform ze Szwajcarii. Mówię po niemiecku, polsku i angielsku.',
     'about.p2':'W trakcie <span>4-letniej praktyki zawodowej (EFZ)</span>, intensywnie uczący się na <span>KodeKloud</span> z prawdziwymi laboratoriami.',
-    'about.p3':'Prowadzę własny <span>homelab na Proxmox</span> z Dockerem i Cloudflare — bo najlepiej uczyć się przez budowanie.',
+    'about.p3':'Prowadzę własny <span>homelab na Proxmox</span> z Dockerem i Cloudflare. bo najlepiej uczyć się przez budowanie.',
     'about.s0':'Pierwszy kontrakt zrealizowany ✓','about.s1':'Planowanych certyfikatów',
     'about.s2':'Praktyka · EFZ · Szwajcaria','about.s3':'Otwarty na możliwości 🌍',
-    'implants.label':'// Rejestr Ulepszeń Cybernetycznych','implants.title':'Implanty Neuronalne','implants.sub':'Stos technologiczny — zainstalowane augmentacje i aktywne oprogramowanie',
+    'implants.label':'// Rejestr Ulepszeń Cybernetycznych','implants.title':'Implanty Neuronalne','implants.sub':'Stos technologiczny. zainstalowane augmentacje i aktywne oprogramowanie',
     'stack.os':'Systemy i serwery','stack.infra':'Infrastruktura i wirtualizacja','stack.cloud':'Chmura i IaC','stack.net':'Sieć','stack.devops':'Skrypty i DevOps','stack.monitor':'Monitoring i tożsamość',
-    'contracts.label':'// Tablica Ogłoszeń Wiedźmina','contracts.title':'Certyfikaty','contracts.sub':'Certyfikaty — zrealizowane, aktywne i w kolejce',
+    'contracts.label':'// Tablica Ogłoszeń Wiedźmina','contracts.title':'Certyfikaty','contracts.sub':'Certyfikaty. zrealizowane, aktywne i w kolejce',
     'certs.done':'Kontrakt zrealizowany','certs.now':'👉 Aktywny teraz','certs.queued':'🔜 W kolejce','certs.optional':'🔜 Opcjonalny','certs.az900date':'Ukończono · 2024',
-    'tree.label':'// Macierz Umiejętności Neural-Link','tree.title':'Drzewo Umiejętności','tree.sub':'Aktywne węzły pulsują — planowane czekają na przesłanie danych',
+    'tree.label':'// Macierz Umiejętności Neural-Link','tree.title':'Drzewo Umiejętności','tree.sub':'Aktywne węzły pulsują. planowane czekają na przesłanie danych',
+    'homelab.label':'// Rejestr Infrastruktury Fizycznej','homelab.title':'Homelab','homelab.sub':'Jeden węzeł. Prawdziwa infrastruktura. Zbudowana do nauki.',
+    'homelab.p1':'Mój homelab działa na jednym <span class="hl">węźle Proxmox</span>. laptopie Intel Core i7 11. generacji z 32 GB RAM, działającym 24/7 z zamkniętą pokrywą. Tu testuję wszystko przed wdrożeniem na produkcję.',
+    'homelab.p2':'Obok stoi <span class="hl">samodzielnie zbudowany NAS</span> (Intel N100, 8 GB DDR5) obsługujący lokalny storage i kopie zapasowe przez Proxmox Backup Server. Cały ruch przechodzi przez <span class="hl">Cloudflare</span>. DNS, CDN i ochrona DDoS. włącznie z tą stroną.',
+    'homelab.p3':'Usługi działają w <span class="hl">Dockerze wewnątrz kontenerów LXC</span> i VM, zarządzane bezpośrednio z interfejsu Proxmox. Całość to na razie pojedynczy host, z planami rozbudowy do <span class="hl">klastra wielowęzłowego</span> z Kubernetes (K3s).',
+    'homelab.p4':'Ta strona jest <span class="hl">hostowana tutaj</span>. Bez dostawcy chmury, bez zarządzanego hostingu. tylko mój własny sprzęt w Szwajcarii.',
+    'homelab.cta':'→ Śledź postępy na GitHub',
     'contact.label':'// Otwórz Kanał Komunikacji','contact.h2':'Porozmawiajmy',
     'contact.p':'Otwarty na stanowiska Platform/DevOps Engineer na całym świecie. Chętnie porozmawiam o infrastrukturze, Kubernetes lub homelabowych projektach.',
     'footer.privacy':'Polityka prywatności','footer.impressum':'Impressum',
