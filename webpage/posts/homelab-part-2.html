@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<!--
+  ═══════════════════════════════════════════════════════════════
+  BLOG POST — HOMELAB PART 2
+  Raspberry Pi QDevice + 40Gbps Thunderbolt cluster link.
+  Trilingual: each language lives in its own .lang-* div.
+
+  Author   : Mateusz Mirosław Woźniak ("Lootregen")
+  Website  : https://lootregen.com
+  Hosting  : Self-hosted · Proxmox + K3s · Switzerland
+  License  : © 2026 Lootregen. All rights reserved.
+             Code structure may be referenced for learning;
+             content and branding may not be copied.
+  Updated  : July 2026
+  ═══════════════════════════════════════════════════════════════
+-->
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homelab Part 2: Pi Tiebreaker & 40Gbps Thunderbolt Link · Lootregen</title>
+<meta name="description" content="How a Raspberry Pi QDevice keeps a two-node Proxmox cluster honest, and how Thunderbolt 4 delivers a 40Gbps cluster interconnect for the price of a cable.">
+<link rel="stylesheet" href="../fonts-inlined.css">
+<link rel="stylesheet" href="../blog.css">
+<script src="../blog-lang.js"></script>
+<script src="../blog-legal.js" defer></script>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="../index.html">Loot<span>regen</span></a>
+  <div class="nav-menu">
+    <a href="../index.html#implants"><span class="lang-en">Tech Stack</span><span class="lang-de">Tech-Stack</span><span class="lang-pl">Tech Stack</span></a>
+    <a href="../index.html#contracts"><span class="lang-en">Certifications</span><span class="lang-de">Zertifikate</span><span class="lang-pl">Certyfikaty</span></a>
+    <a href="../index.html#skilltree"><span class="lang-en">Skill Tree</span><span class="lang-de">Skilltree</span><span class="lang-pl">Drzewo Umiejętności</span></a>
+    <a href="../index.html#homelab">Homelab</a>
+    <a href="../index.html#projects"><span class="lang-en">Projects</span><span class="lang-de">Projekte</span><span class="lang-pl">Projekty</span></a>
+    <a class="current" href="../blog.html">Blog</a>
+    <a href="../index.html#contact"><span class="lang-en">Contact</span><span class="lang-de">Kontakt</span><span class="lang-pl">Kontakt</span></a>
+  </div>
+  <div class="nav-r">
+    <div class="lang-btns">
+      <button class="lbtn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lbtn" data-lang="de" onclick="setLang('de')">DE</button>
+      <button class="lbtn" data-lang="pl" onclick="setLang('pl')">PL</button>
+    </div>
+    <button class="tbtn" id="tbtn" onclick="toggleBlogTheme()" title="Toggle theme" aria-label="Toggle light / dark theme">☀</button>
+    <a class="nav-back" href="../blog.html"><span class="lang-en">← ALL POSTS</span><span class="lang-de">← ALLE BEITRÄGE</span><span class="lang-pl">← WSZYSTKIE WPISY</span></a>
+  </div>
+</nav>
+
+<article>
+  <div class="art-meta"><span>2026-06-24</span><span class="tag">#proxmox #homelab</span><span><span class="lang-en">8 min read</span><span class="lang-de">8 Min. Lesezeit</span><span class="lang-pl">8 min czytania</span></span></div>
+
+  <div class="lang-en">
+    <h1>Homelab Part 2: The Raspberry Pi Tiebreaker and a 40Gbps Thunderbolt Cluster Link</h1>
+    <p class="lede">How a €30 Pi keeps my cluster honest, and how two laptops got a 40Gbps interconnect without a single expensive switch.</p>
+
+    <p>In <a href="homelab-part-1.html">Part 1</a> I covered installing Proxmox on two Dell Precision 3561 nodes and getting backups running. This post digs into two things I only mentioned in passing: the <strong>Raspberry Pi 3 QDevice</strong> and the <strong>dual network setup</strong> — 1Gb Ethernet to the LAN plus a direct 40Gbps Thunderbolt 4 link between the nodes.</p>
+
+    <h2>Part A: The Raspberry Pi That Does Almost Nothing</h2>
+
+    <h3>The two-node problem, properly explained</h3>
+    <p>Proxmox clustering runs on Corosync, and Corosync makes decisions by <strong>majority vote</strong>. Every node gets one vote, and the cluster only operates when more than half the votes are present — that's quorum.</p>
+    <p>Do the math on a two-node cluster:</p>
+    <ul>
+      <li>Both nodes up: 2 of 2 votes → quorum ✔</li>
+      <li>One node down: 1 of 2 votes → <strong>no majority</strong> → quorum lost ✘</li>
+    </ul>
+    <p>So the moment one node fails — the exact scenario a cluster is supposed to handle — the <em>surviving</em> node locks itself down. No starting VMs, no config changes. The cluster protects itself against split-brain by refusing to act, which is correct behavior and completely useless to you at 2 AM.</p>
+
+    <h3>Enter the QDevice</h3>
+    <p>The fix doesn't require a third full Proxmox node. Corosync supports an external <strong>QDevice</strong>: a lightweight daemon (<code>corosync-qnetd</code>) running on any Linux box that provides a third vote without being part of the cluster. It runs no VMs, holds no data, and participates in nothing except arbitration.</p>
+    <p>This is the perfect job for a Raspberry Pi 3 gathering dust in a drawer:</p>
+    <ul>
+      <li>Draws about 2-3 watts</li>
+      <li>Completely passive — it literally just answers "who should have quorum?"</li>
+      <li>If the Pi itself dies while both nodes are healthy, nothing happens (2 of 3 votes is still a majority)</li>
+    </ul>
+
+    <h3>Setup</h3>
+    <p>On the Pi (running Raspberry Pi OS / Debian):</p>
+    <pre><code>apt install corosync-qnetd</code></pre>
+    <p>On the Proxmox nodes:</p>
+    <pre><code>apt install corosync-qdevice   # on both nodes
+pvecm qdevice setup &lt;pi-ip&gt;    # once, from either node</code></pre>
+    <p>Verify:</p>
+    <pre><code>pvecm status
+# Expected: 3 total votes, "Qdevice" listed, quorum 2</code></pre>
+    <p>Now any single failure — node A, node B, or the Pi itself — leaves 2 of 3 votes standing, and the cluster keeps working. Three points of failure, tolerance for any one of them, total extra cost: one Pi and a power brick.</p>
+    <p>One practical note: give the Pi a <strong>static IP</strong> and treat it like infrastructure, not a toy. A QDevice that wanders off DHCP is worse than no QDevice, because you'll debug quorum weirdness before you think to check the Pi.</p>
+
+    <h2>Part B: Two Networks, Two Jobs</h2>
+    <p>The nodes have two completely separate network paths, and the design principle is simple: <strong>cluster traffic and user traffic should never compete.</strong></p>
+
+    <h3>Link 1: 1Gb Ethernet — the front door</h3>
+    <p>Both nodes connect to the LAN over standard gigabit Ethernet (192.168.1.100 and .101). This carries:</p>
+    <ul>
+      <li>Web UI and SSH management access</li>
+      <li>VM traffic to the rest of the network and the internet</li>
+      <li>Backup traffic to storage</li>
+      <li>Corosync heartbeats</li>
+    </ul>
+    <p>1GbE is plenty for all of this. Management is kilobytes, and even backup jobs rarely saturate the line thanks to PBS incremental transfers.</p>
+
+    <h3>Link 2: Thunderbolt 4 — the 40Gbps backbone</h3>
+    <p>Here's the trick that makes laptop-based clustering genuinely good: both Precision 3561s have <strong>Thunderbolt 4 ports</strong>, and Thunderbolt supports <strong>IP networking over a direct cable</strong>. Plug one TB4 cable between the two nodes, and Linux exposes it as a network interface via the <code>thunderbolt-net</code> kernel module.</p>
+    <p>That's a <strong>40Gbps point-to-point link</strong> for the price of one cable. No 10/25/40GbE NICs, no switch, no SFP+ modules — hardware that would cost more than the laptops themselves.</p>
+    <p>The interface shows up (typically as <code>thunderbolt0</code> / <code>en0</code> style naming depending on setup), and you configure it like any other NIC — just on its own private subnet, e.g.:</p>
+    <pre><code>pve-01: 10.0.0.1/30  (thunderbolt)
+pve-02: 10.0.0.2/30  (thunderbolt)</code></pre>
+    <p>A /30 is all you need — two hosts, point to point, nothing else will ever live there.</p>
+
+    <h3>What runs over the Thunderbolt link</h3>
+    <p>Everything heavy that happens <em>between</em> the nodes:</p>
+    <ul>
+      <li><strong>Live migration.</strong> Moving a running VM means shipping its entire RAM contents across. Over 1GbE, a VM with 8GB of RAM takes over a minute of transfer; over the TB4 link it's seconds. Migration goes from "schedule it" to "just do it."</li>
+      <li><strong>Bulk transfers between nodes</strong> — moving disks, templates, restore data from one node to the other.</li>
+    </ul>
+    <p>In the Proxmox datacenter options, you set the migration network to the Thunderbolt subnet, and Proxmox routes all migration traffic there automatically:</p>
+    <pre><code>Datacenter → Options → Migration Settings → Network: 10.0.0.0/30</code></pre>
+
+    <h3>What deliberately doesn't</h3>
+    <p><strong>Corosync stays on Ethernet.</strong> This sounds backwards — why not put cluster communication on the fastest link? Because Corosync doesn't care about bandwidth; it cares about <strong>latency and reliability</strong>, and it needs a network that both nodes <em>and the QDevice</em> can reach. The Pi has no Thunderbolt port. Cluster heartbeats, quorum votes, and QDevice arbitration all live on the 1GbE LAN where all three participants exist.</p>
+    <p>The split, summarized:</p>
+    <table>
+      <thead><tr><th>Traffic</th><th>Link</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Management, VM traffic, backups</td><td>1GbE</td><td>Reaches everything, plenty fast</td></tr>
+        <tr><td>Corosync + QDevice</td><td>1GbE</td><td>Pi must be reachable; latency matters, not bandwidth</td></tr>
+        <tr><td>Live migration, node-to-node bulk</td><td>TB4 (40Gbps)</td><td>RAM-sized transfers, isolated from everything else</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Caveats worth knowing</h3>
+    <ul>
+      <li><strong>Real-world throughput won't hit 40Gbps.</strong> The thunderbolt-net path has CPU overhead, and actual numbers land well below the line rate — but still several times faster than anything you'd get from affordable Ethernet gear.</li>
+      <li><strong>It doesn't survive weirdness like Ethernet does.</strong> Cable reseats or suspend/resume can drop the link; a systemd unit or udev rule to reconfigure the interface on hotplug saves headaches.</li>
+      <li><strong>Two nodes only.</strong> Thunderbolt networking is point-to-point. This design works precisely because the cluster is a pair — a third node would need a different answer.</li>
+    </ul>
+
+    <h2>The Shape of It</h2>
+    <p>Three boxes, two networks:</p>
+    <ul>
+      <li>Two Proxmox nodes joined by a private 40Gbps Thunderbolt backbone for the heavy lifting</li>
+      <li>Both nodes plus a Raspberry Pi on the 1GbE LAN, where quorum lives</li>
+      <li>Any one of the three can die and the cluster shrugs</li>
+    </ul>
+    <p>The total cost of the resilience layer — the Pi and the TB4 cable — is less than a nice dinner. That's the homelab sweet spot: enterprise concepts, pocket-money hardware.</p>
+    <p>Part 3 will build upward from here. The foundation is done.</p>
+  </div>
+
+  <div class="lang-de">
+    <h1>Homelab Teil 2: Der Raspberry Pi als Zünglein an der Waage und ein 40-Gbps-Thunderbolt-Clusterlink</h1>
+    <p class="lede">Wie ein 30-€-Pi meinen Cluster ehrlich hält — und wie zwei Laptops zu einem 40-Gbps-Interconnect kamen, ganz ohne teuren Switch.</p>
+
+    <p>In <a href="homelab-part-1.html">Teil 1</a> ging es um die Proxmox-Installation auf zwei Dell Precision 3561 und laufende Backups. Dieser Beitrag vertieft zwei Dinge, die ich nur am Rande erwähnt habe: das <strong>Raspberry Pi 3 QDevice</strong> und das <strong>doppelte Netzwerk-Setup</strong> — 1-Gb-Ethernet ins LAN plus ein direkter 40-Gbps-Thunderbolt-4-Link zwischen den Knoten.</p>
+
+    <h2>Teil A: Der Raspberry Pi, der fast nichts tut</h2>
+
+    <h3>Das Zwei-Knoten-Problem, richtig erklärt</h3>
+    <p>Proxmox-Clustering läuft auf Corosync, und Corosync entscheidet per <strong>Mehrheitsvotum</strong>. Jeder Knoten hat eine Stimme, und der Cluster arbeitet nur, wenn mehr als die Hälfte der Stimmen anwesend ist — das ist das Quorum.</p>
+    <p>Rechnen wir für einen Zwei-Knoten-Cluster nach:</p>
+    <ul>
+      <li>Beide Knoten oben: 2 von 2 Stimmen → Quorum ✔</li>
+      <li>Ein Knoten unten: 1 von 2 Stimmen → <strong>keine Mehrheit</strong> → Quorum verloren ✘</li>
+    </ul>
+    <p>In dem Moment, in dem ein Knoten ausfällt — genau das Szenario, für das ein Cluster da ist — sperrt sich der <em>überlebende</em> Knoten selbst. Keine VMs starten, keine Konfigurationsänderungen. Der Cluster schützt sich vor Split-Brain, indem er nichts mehr tut. Korrekt — und um 2 Uhr nachts völlig nutzlos.</p>
+
+    <h3>Auftritt: das QDevice</h3>
+    <p>Die Lösung braucht keinen dritten vollwertigen Proxmox-Knoten. Corosync unterstützt ein externes <strong>QDevice</strong>: ein leichtgewichtiger Daemon (<code>corosync-qnetd</code>) auf einer beliebigen Linux-Kiste, der eine dritte Stimme liefert, ohne Teil des Clusters zu sein. Er betreibt keine VMs, hält keine Daten und beteiligt sich an nichts außer der Schiedsrichterrolle.</p>
+    <p>Der perfekte Job für einen Raspberry Pi 3, der in der Schublade verstaubt:</p>
+    <ul>
+      <li>Verbraucht etwa 2-3 Watt</li>
+      <li>Völlig passiv — er beantwortet buchstäblich nur „wer soll das Quorum haben?"</li>
+      <li>Stirbt der Pi selbst, während beide Knoten gesund sind, passiert nichts (2 von 3 Stimmen sind immer noch eine Mehrheit)</li>
+    </ul>
+
+    <h3>Einrichtung</h3>
+    <p>Auf dem Pi (mit Raspberry Pi OS / Debian):</p>
+    <pre><code>apt install corosync-qnetd</code></pre>
+    <p>Auf den Proxmox-Knoten:</p>
+    <pre><code>apt install corosync-qdevice   # auf beiden Knoten
+pvecm qdevice setup &lt;pi-ip&gt;    # einmal, von einem der Knoten</code></pre>
+    <p>Prüfen:</p>
+    <pre><code>pvecm status
+# Erwartet: 3 Stimmen gesamt, "Qdevice" gelistet, Quorum 2</code></pre>
+    <p>Jetzt lässt jeder einzelne Ausfall — Knoten A, Knoten B oder der Pi selbst — 2 von 3 Stimmen stehen, und der Cluster arbeitet weiter. Drei mögliche Ausfallpunkte, Toleranz für jeden einzelnen, Gesamtkosten: ein Pi und ein Netzteil.</p>
+    <p>Ein praktischer Hinweis: Gib dem Pi eine <strong>statische IP</strong> und behandle ihn wie Infrastruktur, nicht wie Spielzeug. Ein QDevice, das per DHCP herumwandert, ist schlimmer als keins — man debuggt Quorum-Merkwürdigkeiten, bevor man auf die Idee kommt, den Pi zu prüfen.</p>
+
+    <h2>Teil B: Zwei Netzwerke, zwei Aufgaben</h2>
+    <p>Die Knoten haben zwei komplett getrennte Netzwerkpfade, und das Designprinzip ist simpel: <strong>Cluster-Traffic und Nutzer-Traffic dürfen nie konkurrieren.</strong></p>
+
+    <h3>Link 1: 1-Gb-Ethernet — die Eingangstür</h3>
+    <p>Beide Knoten hängen über Standard-Gigabit-Ethernet im LAN (192.168.1.100 und .101). Darüber laufen:</p>
+    <ul>
+      <li>Web-UI- und SSH-Verwaltungszugriff</li>
+      <li>VM-Traffic ins restliche Netz und ins Internet</li>
+      <li>Backup-Traffic zum Storage</li>
+      <li>Corosync-Heartbeats</li>
+    </ul>
+    <p>1GbE reicht dafür locker. Verwaltung sind Kilobytes, und selbst Backup-Jobs sättigen die Leitung dank inkrementeller PBS-Transfers selten.</p>
+
+    <h3>Link 2: Thunderbolt 4 — das 40-Gbps-Rückgrat</h3>
+    <p>Hier kommt der Trick, der Laptop-Clustering richtig gut macht: Beide Precision 3561 haben <strong>Thunderbolt-4-Ports</strong>, und Thunderbolt unterstützt <strong>IP-Netzwerk über ein Direktkabel</strong>. Ein TB4-Kabel zwischen die Knoten gesteckt, und Linux stellt es über das Kernelmodul <code>thunderbolt-net</code> als Netzwerkschnittstelle bereit.</p>
+    <p>Das ist ein <strong>40-Gbps-Punkt-zu-Punkt-Link</strong> zum Preis eines Kabels. Keine 10/25/40GbE-NICs, kein Switch, keine SFP+-Module — Hardware, die mehr kosten würde als die Laptops selbst.</p>
+    <p>Die Schnittstelle taucht auf (je nach Setup als <code>thunderbolt0</code> / <code>en0</code>-artige Benennung) und wird wie jede andere NIC konfiguriert — nur auf einem eigenen privaten Subnetz, z. B.:</p>
+    <pre><code>pve-01: 10.0.0.1/30  (thunderbolt)
+pve-02: 10.0.0.2/30  (thunderbolt)</code></pre>
+    <p>Ein /30 genügt völlig — zwei Hosts, Punkt zu Punkt, dort wird nie etwas anderes wohnen.</p>
+
+    <h3>Was über den Thunderbolt-Link läuft</h3>
+    <p>Alles Schwere, das <em>zwischen</em> den Knoten passiert:</p>
+    <ul>
+      <li><strong>Live-Migration.</strong> Eine laufende VM zu verschieben heißt, ihren gesamten RAM-Inhalt zu übertragen. Über 1GbE braucht eine VM mit 8 GB RAM über eine Minute; über den TB4-Link sind es Sekunden. Migration wird von „einplanen" zu „einfach machen".</li>
+      <li><strong>Bulk-Transfers zwischen Knoten</strong> — Disks, Templates, Restore-Daten von einem Knoten zum anderen.</li>
+    </ul>
+    <p>In den Datacenter-Optionen von Proxmox setzt man das Migrationsnetzwerk auf das Thunderbolt-Subnetz, und Proxmox leitet allen Migrationsverkehr automatisch dorthin:</p>
+    <pre><code>Datacenter → Options → Migration Settings → Network: 10.0.0.0/30</code></pre>
+
+    <h3>Was bewusst nicht darüber läuft</h3>
+    <p><strong>Corosync bleibt auf Ethernet.</strong> Das klingt verkehrt — warum die Cluster-Kommunikation nicht auf den schnellsten Link legen? Weil Corosync Bandbreite egal ist; es geht um <strong>Latenz und Zuverlässigkeit</strong>, und es braucht ein Netz, das beide Knoten <em>und das QDevice</em> erreichen. Der Pi hat keinen Thunderbolt-Port. Cluster-Heartbeats, Quorum-Abstimmungen und QDevice-Arbitrierung leben alle im 1GbE-LAN, wo alle drei Teilnehmer existieren.</p>
+    <p>Die Aufteilung, zusammengefasst:</p>
+    <table>
+      <thead><tr><th>Traffic</th><th>Link</th><th>Warum</th></tr></thead>
+      <tbody>
+        <tr><td>Verwaltung, VM-Traffic, Backups</td><td>1GbE</td><td>Erreicht alles, schnell genug</td></tr>
+        <tr><td>Corosync + QDevice</td><td>1GbE</td><td>Pi muss erreichbar sein; Latenz zählt, nicht Bandbreite</td></tr>
+        <tr><td>Live-Migration, Bulk zwischen Knoten</td><td>TB4 (40Gbps)</td><td>RAM-große Transfers, von allem anderen isoliert</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Wissenswerte Einschränkungen</h3>
+    <ul>
+      <li><strong>Realer Durchsatz erreicht keine 40 Gbps.</strong> Der thunderbolt-net-Pfad hat CPU-Overhead, und echte Zahlen liegen deutlich unter der Leitungsrate — aber immer noch um ein Mehrfaches über allem, was bezahlbare Ethernet-Hardware liefert.</li>
+      <li><strong>Er übersteht Störungen nicht so wie Ethernet.</strong> Kabel-Neustecken oder Suspend/Resume können den Link trennen; eine systemd-Unit oder udev-Regel, die die Schnittstelle bei Hotplug neu konfiguriert, erspart Kopfschmerzen.</li>
+      <li><strong>Nur zwei Knoten.</strong> Thunderbolt-Netzwerk ist Punkt zu Punkt. Dieses Design funktioniert genau deshalb, weil der Cluster ein Paar ist — ein dritter Knoten bräuchte eine andere Antwort.</li>
+    </ul>
+
+    <h2>Das Gesamtbild</h2>
+    <p>Drei Kisten, zwei Netzwerke:</p>
+    <ul>
+      <li>Zwei Proxmox-Knoten, verbunden durch ein privates 40-Gbps-Thunderbolt-Rückgrat für die schwere Arbeit</li>
+      <li>Beide Knoten plus ein Raspberry Pi im 1GbE-LAN, wo das Quorum lebt</li>
+      <li>Jede der drei Kisten darf sterben, und der Cluster zuckt mit den Schultern</li>
+    </ul>
+    <p>Die Gesamtkosten der Resilienz-Schicht — Pi und TB4-Kabel — liegen unter einem guten Abendessen. Das ist der Homelab-Sweetspot: Enterprise-Konzepte, Taschengeld-Hardware.</p>
+    <p>Teil 3 baut von hier nach oben. Das Fundament steht.</p>
+  </div>
+
+  <div class="lang-pl">
+    <h1>Homelab część 2: Raspberry Pi jako rozjemca i łącze klastrowe Thunderbolt 40 Gb/s</h1>
+    <p class="lede">Jak Pi za 30 € pilnuje uczciwości klastra i jak dwa laptopy dostały łącze 40 Gb/s bez ani jednego drogiego switcha.</p>
+
+    <p>W <a href="homelab-part-1.html">części 1</a> opisałem instalację Proxmoxa na dwóch węzłach Dell Precision 3561 i uruchomienie backupów. Ten wpis zagłębia się w dwie rzeczy, o których wspomniałem tylko mimochodem: <strong>QDevice na Raspberry Pi 3</strong> i <strong>podwójną konfigurację sieci</strong> — 1 Gb Ethernet do LAN-u plus bezpośrednie łącze Thunderbolt 4 40 Gb/s między węzłami.</p>
+
+    <h2>Część A: Raspberry Pi, które nie robi prawie nic</h2>
+
+    <h3>Problem dwóch węzłów, porządnie wyjaśniony</h3>
+    <p>Klastrowanie Proxmoxa opiera się na Corosyncu, a Corosync podejmuje decyzje <strong>większością głosów</strong>. Każdy węzeł ma jeden głos, a klaster działa tylko wtedy, gdy obecna jest ponad połowa głosów — to jest kworum.</p>
+    <p>Policzmy dla klastra dwuwęzłowego:</p>
+    <ul>
+      <li>Oba węzły działają: 2 z 2 głosów → kworum ✔</li>
+      <li>Jeden węzeł pada: 1 z 2 głosów → <strong>brak większości</strong> → kworum utracone ✘</li>
+    </ul>
+    <p>Czyli w momencie awarii jednego węzła — dokładnie w scenariuszu, do którego klaster jest stworzony — <em>ocalały</em> węzeł sam się blokuje. Żadnego startowania VM-ek, żadnych zmian konfiguracji. Klaster chroni się przed split-brainem, odmawiając działania. Zachowanie poprawne — i kompletnie bezużyteczne o 2 w nocy.</p>
+
+    <h3>Wchodzi QDevice</h3>
+    <p>Rozwiązanie nie wymaga trzeciego pełnoprawnego węzła Proxmoxa. Corosync obsługuje zewnętrzny <strong>QDevice</strong>: lekki daemon (<code>corosync-qnetd</code>) działający na dowolnej linuksowej maszynie, który dostarcza trzeci głos, nie będąc częścią klastra. Nie uruchamia VM-ek, nie trzyma danych i nie uczestniczy w niczym poza arbitrażem.</p>
+    <p>To idealna robota dla Raspberry Pi 3 kurzącego się w szufladzie:</p>
+    <ul>
+      <li>Pobiera około 2-3 watów</li>
+      <li>Całkowicie pasywny — dosłownie tylko odpowiada na pytanie „kto ma mieć kworum?"</li>
+      <li>Jeśli samo Pi padnie, gdy oba węzły są zdrowe, nic się nie dzieje (2 z 3 głosów to nadal większość)</li>
+    </ul>
+
+    <h3>Konfiguracja</h3>
+    <p>Na Pi (z Raspberry Pi OS / Debianem):</p>
+    <pre><code>apt install corosync-qnetd</code></pre>
+    <p>Na węzłach Proxmoxa:</p>
+    <pre><code>apt install corosync-qdevice   # na obu węzłach
+pvecm qdevice setup &lt;pi-ip&gt;    # raz, z dowolnego węzła</code></pre>
+    <p>Weryfikacja:</p>
+    <pre><code>pvecm status
+# Oczekiwane: 3 głosy łącznie, "Qdevice" na liście, kworum 2</code></pre>
+    <p>Teraz każda pojedyncza awaria — węzeł A, węzeł B albo samo Pi — zostawia 2 z 3 głosów, a klaster działa dalej. Trzy punkty awarii, tolerancja na każdy z nich, całkowity dodatkowy koszt: jedno Pi i zasilacz.</p>
+    <p>Jedna praktyczna uwaga: daj Pi <strong>statyczne IP</strong> i traktuj je jak infrastrukturę, nie zabawkę. QDevice błądzące po DHCP jest gorsze niż brak QDevice, bo będziesz debugować dziwactwa kworum, zanim przyjdzie ci do głowy sprawdzić Pi.</p>
+
+    <h2>Część B: Dwie sieci, dwa zadania</h2>
+    <p>Węzły mają dwie całkowicie oddzielne ścieżki sieciowe, a zasada projektowa jest prosta: <strong>ruch klastrowy i ruch użytkowników nigdy nie powinny konkurować.</strong></p>
+
+    <h3>Łącze 1: Ethernet 1 Gb — drzwi frontowe</h3>
+    <p>Oba węzły łączą się z LAN-em przez standardowy gigabitowy Ethernet (192.168.1.100 i .101). Tędy idzie:</p>
+    <ul>
+      <li>Dostęp zarządczy przez web UI i SSH</li>
+      <li>Ruch VM-ek do reszty sieci i internetu</li>
+      <li>Ruch backupowy do storage</li>
+      <li>Heartbeaty Corosynca</li>
+    </ul>
+    <p>1GbE w zupełności wystarcza. Zarządzanie to kilobajty, a nawet zadania backupu rzadko nasycają łącze dzięki przyrostowym transferom PBS.</p>
+
+    <h3>Łącze 2: Thunderbolt 4 — kręgosłup 40 Gb/s</h3>
+    <p>Oto trik, który czyni klastrowanie na laptopach naprawdę dobrym: oba Precision 3561 mają <strong>porty Thunderbolt 4</strong>, a Thunderbolt obsługuje <strong>sieć IP po bezpośrednim kablu</strong>. Wepnij jeden kabel TB4 między węzły, a Linux wystawi go jako interfejs sieciowy przez moduł jądra <code>thunderbolt-net</code>.</p>
+    <p>To <strong>łącze punkt-punkt 40 Gb/s</strong> w cenie jednego kabla. Żadnych kart 10/25/40GbE, żadnego switcha, żadnych modułów SFP+ — sprzętu, który kosztowałby więcej niż same laptopy.</p>
+    <p>Interfejs pojawia się w systemie (zwykle jako <code>thunderbolt0</code> / nazwa w stylu <code>en0</code>, zależnie od konfiguracji) i konfiguruje się go jak każdą inną kartę — tylko we własnej prywatnej podsieci, np.:</p>
+    <pre><code>pve-01: 10.0.0.1/30  (thunderbolt)
+pve-02: 10.0.0.2/30  (thunderbolt)</code></pre>
+    <p>/30 to wszystko, czego potrzeba — dwa hosty, punkt-punkt, nic innego tam nigdy nie zamieszka.</p>
+
+    <h3>Co biegnie po łączu Thunderbolt</h3>
+    <p>Wszystko ciężkie, co dzieje się <em>między</em> węzłami:</p>
+    <ul>
+      <li><strong>Migracja na żywo.</strong> Przeniesienie działającej VM oznacza przesłanie całej zawartości jej RAM-u. Po 1GbE maszyna z 8 GB RAM potrzebuje ponad minuty transferu; po łączu TB4 to sekundy. Migracja zmienia się z „zaplanuj to" w „po prostu zrób".</li>
+      <li><strong>Masowe transfery między węzłami</strong> — przenoszenie dysków, szablonów, danych restore z jednego węzła na drugi.</li>
+    </ul>
+    <p>W opcjach datacenter Proxmoxa ustawia się sieć migracji na podsieć Thunderbolt i Proxmox automatycznie kieruje tam cały ruch migracyjny:</p>
+    <pre><code>Datacenter → Options → Migration Settings → Network: 10.0.0.0/30</code></pre>
+
+    <h3>Co celowo nie biegnie</h3>
+    <p><strong>Corosync zostaje na Ethernecie.</strong> Brzmi to na odwrót — czemu nie puścić komunikacji klastra po najszybszym łączu? Bo Corosynca nie obchodzi przepustowość; obchodzi go <strong>opóźnienie i niezawodność</strong>, a potrzebuje sieci, do której dotrą oba węzły <em>i QDevice</em>. Pi nie ma portu Thunderbolt. Heartbeaty klastra, głosowania kworum i arbitraż QDevice żyją w LAN-ie 1GbE, gdzie istnieją wszyscy trzej uczestnicy.</p>
+    <p>Podział w skrócie:</p>
+    <table>
+      <thead><tr><th>Ruch</th><th>Łącze</th><th>Dlaczego</th></tr></thead>
+      <tbody>
+        <tr><td>Zarządzanie, ruch VM, backupy</td><td>1GbE</td><td>Dociera wszędzie, wystarczająco szybkie</td></tr>
+        <tr><td>Corosync + QDevice</td><td>1GbE</td><td>Pi musi być osiągalne; liczy się opóźnienie, nie przepustowość</td></tr>
+        <tr><td>Migracja na żywo, transfery masowe</td><td>TB4 (40Gb/s)</td><td>Transfery wielkości RAM-u, odizolowane od reszty</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Zastrzeżenia warte znajomości</h3>
+    <ul>
+      <li><strong>Rzeczywista przepustowość nie sięgnie 40 Gb/s.</strong> Ścieżka thunderbolt-net ma narzut CPU i realne liczby lądują wyraźnie poniżej nominalnej prędkości — ale wciąż kilkukrotnie szybciej niż cokolwiek z przystępnego cenowo sprzętu Ethernet.</li>
+      <li><strong>Nie znosi dziwactw tak jak Ethernet.</strong> Przepięcie kabla albo suspend/resume potrafi zerwać łącze; unit systemd lub reguła udev rekonfigurująca interfejs przy hotplugu oszczędza bólu głowy.</li>
+      <li><strong>Tylko dwa węzły.</strong> Sieć Thunderbolt jest punkt-punkt. Ten projekt działa właśnie dlatego, że klaster to para — trzeci węzeł wymagałby innej odpowiedzi.</li>
+    </ul>
+
+    <h2>Całokształt</h2>
+    <p>Trzy pudełka, dwie sieci:</p>
+    <ul>
+      <li>Dwa węzły Proxmoxa połączone prywatnym kręgosłupem Thunderbolt 40 Gb/s do ciężkiej roboty</li>
+      <li>Oba węzły plus Raspberry Pi w LAN-ie 1GbE, gdzie mieszka kworum</li>
+      <li>Każde z trzech może umrzeć, a klaster wzrusza ramionami</li>
+    </ul>
+    <p>Łączny koszt warstwy odporności — Pi i kabel TB4 — to mniej niż dobra kolacja. To jest właśnie słodki punkt homelabu: koncepty klasy enterprise, sprzęt za kieszonkowe.</p>
+    <p>Część 3 będzie budować w górę. Fundament gotowy.</p>
+  </div>
+
+  <div class="art-footer">
+    <a href="homelab-part-1.html"><span class="lang-en">← PART 1: BASE SETUP</span><span class="lang-de">← TEIL 1: GRUNDSETUP</span><span class="lang-pl">← CZĘŚĆ 1: KONFIGURACJA</span></a>
+    <a href="../blog.html"><span class="lang-en">ALL POSTS →</span><span class="lang-de">ALLE BEITRÄGE →</span><span class="lang-pl">WSZYSTKIE WPISY →</span></a>
+  </div>
+</article>
+
+<footer>
+  <p>© 2026 <span>Lootregen</span> · <span class="lang-en">Self-hosted in Switzerland</span><span class="lang-de">Selbst gehostet in der Schweiz</span><span class="lang-pl">Hostowane samodzielnie w Szwajcarii</span></p>
+
+  <div class="footer-links">
+    <a onclick="openLegal('privacy')"><span class="lang-en">Privacy Policy</span><span class="lang-de">Datenschutz</span><span class="lang-pl">Polityka prywatności</span></a>
+    <a onclick="openLegal('impressum')">Impressum</a>
+  </div>
+</footer>
+
+</body>
+</html>

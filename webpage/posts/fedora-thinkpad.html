@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<!--
+  ═══════════════════════════════════════════════════════════════
+  BLOG POST — FEDORA THINKPAD
+  Daily driver: ThinkPad T14 Gen 1 AMD + Fedora KDE.
+  Trilingual: each language lives in its own .lang-* div.
+
+  Author   : Mateusz Mirosław Woźniak ("Lootregen")
+  Website  : https://lootregen.com
+  Hosting  : Self-hosted · Proxmox + K3s · Switzerland
+  License  : © 2026 Lootregen. All rights reserved.
+             Code structure may be referenced for learning;
+             content and branding may not be copied.
+  Updated  : July 2026
+  ═══════════════════════════════════════════════════════════════
+-->
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Daily Driver: ThinkPad T14 Gen 1 AMD + Fedora KDE · Lootregen</title>
+<meta name="description" content="Why a used ThinkPad T14 Gen 1 AMD with Fedora KDE, 32 GB RAM and fresh thermal paste is the best-value Linux workstation for homelab and DevOps work.">
+<link rel="stylesheet" href="../fonts-inlined.css">
+<link rel="stylesheet" href="../blog.css">
+<script src="../blog-lang.js"></script>
+<script src="../blog-legal.js" defer></script>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="../index.html">Loot<span>regen</span></a>
+  <div class="nav-menu">
+    <a href="../index.html#implants"><span class="lang-en">Tech Stack</span><span class="lang-de">Tech-Stack</span><span class="lang-pl">Tech Stack</span></a>
+    <a href="../index.html#contracts"><span class="lang-en">Certifications</span><span class="lang-de">Zertifikate</span><span class="lang-pl">Certyfikaty</span></a>
+    <a href="../index.html#skilltree"><span class="lang-en">Skill Tree</span><span class="lang-de">Skilltree</span><span class="lang-pl">Drzewo Umiejętności</span></a>
+    <a href="../index.html#homelab">Homelab</a>
+    <a href="../index.html#projects"><span class="lang-en">Projects</span><span class="lang-de">Projekte</span><span class="lang-pl">Projekty</span></a>
+    <a class="current" href="../blog.html">Blog</a>
+    <a href="../index.html#contact"><span class="lang-en">Contact</span><span class="lang-de">Kontakt</span><span class="lang-pl">Kontakt</span></a>
+  </div>
+  <div class="nav-r">
+    <div class="lang-btns">
+      <button class="lbtn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lbtn" data-lang="de" onclick="setLang('de')">DE</button>
+      <button class="lbtn" data-lang="pl" onclick="setLang('pl')">PL</button>
+    </div>
+    <button class="tbtn" id="tbtn" onclick="toggleBlogTheme()" title="Toggle theme" aria-label="Toggle light / dark theme">☀</button>
+    <a class="nav-back" href="../blog.html"><span class="lang-en">← ALL POSTS</span><span class="lang-de">← ALLE BEITRÄGE</span><span class="lang-pl">← WSZYSTKIE WPISY</span></a>
+  </div>
+</nav>
+
+<article>
+  <div class="art-meta"><span>2026-07-04</span><span class="tag">#linux #fedora</span><span><span class="lang-en">5 min read</span><span class="lang-de">5 Min. Lesezeit</span><span class="lang-pl">5 min czytania</span></span></div>
+
+  <div class="lang-en">
+    <h1>My Daily Driver: A ThinkPad T14 Gen 1 AMD Running Fedora KDE</h1>
+    <p class="lede">The used ThinkPad + Fedora combo is a cliché for a reason — it just works.</p>
+
+    <p>Ask anyone in the Linux community what laptop to buy and you'll get the same answer: a used ThinkPad. I'm here to confirm the cliché. My daily driver and homelab workstation is a <strong>ThinkPad T14 Gen 1 AMD</strong>, and it's the best value machine I've ever owned.</p>
+
+    <h2>The Hardware</h2>
+    <ul>
+      <li><strong>CPU:</strong> AMD Ryzen 5 PRO 4650U — 6 cores / 12 threads, still plenty fast in 2026</li>
+      <li><strong>RAM:</strong> Upgraded to <strong>32 GB @ 3200 MHz</strong> — this is the single best upgrade you can do on this machine</li>
+      <li><strong>Fresh thermal paste</strong> — a 20-minute job that dropped temps noticeably and stopped throttling under sustained load</li>
+      <li>The usual ThinkPad perks: great keyboard, solid build, easy to open, parts everywhere</li>
+    </ul>
+    <p>The T14 Gen 1 hits a sweet spot on the used market: business laptops come off corporate leases in huge numbers, so you get workstation-class hardware for a fraction of the original price. The Ryzen 4650U in particular aged extremely well — 6 cores was generous for an ultrabook in its day, and it still handles anything I throw at it.</p>
+
+    <h2>Why Fedora KDE?</h2>
+    <p>I run <strong>Fedora KDE</strong> as my only OS on this machine. The reasoning:</p>
+    <p><strong>Fedora</strong> gives you a modern kernel and fresh packages without being bleeding-edge unstable. On AMD hardware that matters — newer kernels mean better power management, better graphics, fewer weird suspend bugs. Everything on the T14 works out of the box: WiFi, suspend, fingerprint reader, function keys, all of it.</p>
+    <p><strong>KDE Plasma</strong> is the desktop for people who actually configure things. It's fast, it stays out of the way, and when I want to change something, there's a setting for it instead of a GNOME extension that breaks every release. Plasma on a 6-core machine with 32 GB of RAM feels instant.</p>
+    <p>The combination is boring in the best way. I don't fight my OS. I open a terminal and get to work.</p>
+
+    <h2>What I Actually Use It For</h2>
+    <p>This laptop is the control center for my entire homelab:</p>
+    <ul>
+      <li><strong>SSH into the Proxmox cluster</strong> — two nodes plus a Proxmox Backup Server, all managed from this keyboard</li>
+      <li><strong>kubectl against my K3s cluster</strong> — which hosts my portfolio site, among other things</li>
+      <li><strong>Terraform, Docker, Ansible</strong> — all the IaC and container tooling runs locally</li>
+      <li><strong>Tailscale</strong> — the whole lab is reachable from anywhere, and this laptop is the client I use most</li>
+      <li><strong>Obsidian</strong> for documentation and study notes</li>
+      <li><strong>Certification prep</strong> — labs, practice exams, and endless terminal drills</li>
+    </ul>
+    <p>Having a real Linux machine as your daily driver changes how you learn. Every problem is a chance to practice: networking, systemd, storage, permissions. You can't fake that experience in a VM you only open twice a week.</p>
+
+    <h2>The 32 GB Upgrade</h2>
+    <p>If you own one of these: max the RAM. The T14 Gen 1 AMD has one soldered slot and one SODIMM slot. Going to 32 GB total means you can run local VMs, a browser with too many tabs, containers, and an IDE simultaneously without ever touching swap. RAM prices on DDR4 SODIMMs are trivial now — it's the cheapest quality-of-life upgrade in computing.</p>
+    <p>The re-paste is the other one. These machines are often 4-5 years old with original factory paste. Fresh paste plus a dust cleanout brings back the performance the laptop shipped with.</p>
+
+    <h2>Verdict</h2>
+    <p>Used business ThinkPad + Fedora KDE + a cheap RAM upgrade = a Linux workstation that punches far above its price. If you're getting into Linux, DevOps, or homelabbing and you're deciding what to run it all on — this is the answer. Don't overthink it.</p>
+  </div>
+
+  <div class="lang-de">
+    <h1>Mein Daily Driver: Ein ThinkPad T14 Gen 1 AMD mit Fedora KDE</h1>
+    <p class="lede">Die Kombi gebrauchtes ThinkPad + Fedora ist aus gutem Grund ein Klischee — sie funktioniert einfach.</p>
+
+    <p>Frag irgendjemanden in der Linux-Community, welchen Laptop man kaufen soll, und du bekommst dieselbe Antwort: ein gebrauchtes ThinkPad. Ich bin hier, um das Klischee zu bestätigen. Mein Daily Driver und meine Homelab-Workstation ist ein <strong>ThinkPad T14 Gen 1 AMD</strong> — die Maschine mit dem besten Preis-Leistungs-Verhältnis, die ich je besessen habe.</p>
+
+    <h2>Die Hardware</h2>
+    <ul>
+      <li><strong>CPU:</strong> AMD Ryzen 5 PRO 4650U — 6 Kerne / 12 Threads, auch 2026 noch flott genug</li>
+      <li><strong>RAM:</strong> Aufgerüstet auf <strong>32 GB @ 3200 MHz</strong> — das mit Abstand beste Upgrade für diese Maschine</li>
+      <li><strong>Frische Wärmeleitpaste</strong> — ein 20-Minuten-Job, der die Temperaturen spürbar gesenkt und das Throttling unter Dauerlast beendet hat</li>
+      <li>Die üblichen ThinkPad-Vorzüge: großartige Tastatur, solide Verarbeitung, leicht zu öffnen, Ersatzteile überall</li>
+    </ul>
+    <p>Das T14 Gen 1 trifft auf dem Gebrauchtmarkt einen Sweetspot: Business-Laptops kommen massenhaft aus Firmenleasing zurück, also bekommt man Workstation-Hardware für einen Bruchteil des Originalpreises. Gerade der Ryzen 4650U ist extrem gut gealtert — 6 Kerne waren seinerzeit großzügig für ein Ultrabook, und er verarbeitet immer noch alles, was ich ihm vorwerfe.</p>
+
+    <h2>Warum Fedora KDE?</h2>
+    <p>Auf dieser Maschine läuft <strong>Fedora KDE</strong> als einziges Betriebssystem. Die Begründung:</p>
+    <p><strong>Fedora</strong> liefert einen modernen Kernel und frische Pakete, ohne instabile Bleeding Edge zu sein. Auf AMD-Hardware zählt das — neuere Kernel bedeuten besseres Power-Management, bessere Grafik, weniger seltsame Suspend-Bugs. Auf dem T14 funktioniert alles out of the box: WLAN, Suspend, Fingerabdruckleser, Funktionstasten, alles.</p>
+    <p><strong>KDE Plasma</strong> ist der Desktop für Leute, die wirklich Dinge konfigurieren. Er ist schnell, bleibt aus dem Weg, und wenn ich etwas ändern will, gibt es eine Einstellung dafür statt einer GNOME-Extension, die bei jedem Release kaputtgeht. Plasma auf einer 6-Kern-Maschine mit 32 GB RAM fühlt sich augenblicklich an.</p>
+    <p>Die Kombination ist langweilig im besten Sinne. Ich kämpfe nicht mit meinem OS. Ich öffne ein Terminal und lege los.</p>
+
+    <h2>Wofür ich es tatsächlich nutze</h2>
+    <p>Dieser Laptop ist die Kommandozentrale für mein gesamtes Homelab:</p>
+    <ul>
+      <li><strong>SSH in den Proxmox-Cluster</strong> — zwei Knoten plus Proxmox Backup Server, alles von dieser Tastatur aus verwaltet</li>
+      <li><strong>kubectl gegen meinen K3s-Cluster</strong> — der unter anderem meine Portfolio-Seite hostet</li>
+      <li><strong>Terraform, Docker, Ansible</strong> — das gesamte IaC- und Container-Tooling läuft lokal</li>
+      <li><strong>Tailscale</strong> — das ganze Lab ist von überall erreichbar, und dieser Laptop ist der meistgenutzte Client</li>
+      <li><strong>Obsidian</strong> für Dokumentation und Lernnotizen</li>
+      <li><strong>Zertifikatsvorbereitung</strong> — Labs, Übungsprüfungen und endlose Terminal-Drills</li>
+    </ul>
+    <p>Eine echte Linux-Maschine als Daily Driver verändert, wie man lernt. Jedes Problem ist eine Übungsgelegenheit: Netzwerk, systemd, Storage, Berechtigungen. Diese Erfahrung kann man in einer VM, die man zweimal pro Woche öffnet, nicht faken.</p>
+
+    <h2>Das 32-GB-Upgrade</h2>
+    <p>Falls du eins davon besitzt: maximiere den RAM. Das T14 Gen 1 AMD hat einen verlöteten Slot und einen SODIMM-Slot. Mit insgesamt 32 GB laufen lokale VMs, ein Browser mit zu vielen Tabs, Container und eine IDE gleichzeitig, ohne je den Swap zu berühren. DDR4-SODIMM-Preise sind inzwischen trivial — das günstigste Quality-of-Life-Upgrade der Computerwelt.</p>
+    <p>Die neue Paste ist das zweite. Diese Maschinen sind oft 4-5 Jahre alt und tragen noch die Werkspaste. Frische Paste plus Staubreinigung bringt die Leistung zurück, mit der der Laptop ausgeliefert wurde.</p>
+
+    <h2>Fazit</h2>
+    <p>Gebrauchtes Business-ThinkPad + Fedora KDE + günstiges RAM-Upgrade = eine Linux-Workstation, die weit über ihrem Preis spielt. Wer in Linux, DevOps oder Homelabbing einsteigt und überlegt, worauf das alles laufen soll — das hier ist die Antwort. Nicht überdenken.</p>
+  </div>
+
+  <div class="lang-pl">
+    <h1>Mój codzienny sprzęt: ThinkPad T14 Gen 1 AMD z Fedorą KDE</h1>
+    <p class="lede">Używany ThinkPad + Fedora to klisza nie bez powodu — po prostu działa.</p>
+
+    <p>Zapytaj kogokolwiek ze społeczności linuksowej, jaki laptop kupić, a dostaniesz tę samą odpowiedź: używanego ThinkPada. Jestem tu, żeby potwierdzić tę kliszę. Moim codziennym sprzętem i stacją roboczą do homelabu jest <strong>ThinkPad T14 Gen 1 AMD</strong> — maszyna o najlepszym stosunku wartości do ceny, jaką kiedykolwiek miałem.</p>
+
+    <h2>Sprzęt</h2>
+    <ul>
+      <li><strong>CPU:</strong> AMD Ryzen 5 PRO 4650U — 6 rdzeni / 12 wątków, wciąż wystarczająco szybki w 2026</li>
+      <li><strong>RAM:</strong> Rozbudowany do <strong>32 GB @ 3200 MHz</strong> — to najlepszy pojedynczy upgrade, jaki można zrobić w tej maszynie</li>
+      <li><strong>Świeża pasta termoprzewodząca</strong> — 20 minut roboty, które zauważalnie obniżyły temperatury i zakończyły throttling pod długim obciążeniem</li>
+      <li>Typowe zalety ThinkPada: świetna klawiatura, solidna konstrukcja, łatwy do otwarcia, części wszędzie</li>
+    </ul>
+    <p>T14 Gen 1 trafia w słodki punkt rynku wtórnego: laptopy biznesowe masowo schodzą z firmowych leasingów, więc dostajesz sprzęt klasy workstation za ułamek pierwotnej ceny. Zwłaszcza Ryzen 4650U zestarzał się znakomicie — 6 rdzeni było jak na ultrabooka hojne w swoich czasach i nadal radzi sobie ze wszystkim, co mu podrzucę.</p>
+
+    <h2>Dlaczego Fedora KDE?</h2>
+    <p>Na tej maszynie działa <strong>Fedora KDE</strong> jako jedyny system. Uzasadnienie:</p>
+    <p><strong>Fedora</strong> daje nowoczesne jądro i świeże pakiety, nie będąc niestabilnym bleeding edge. Na sprzęcie AMD to ma znaczenie — nowsze jądra to lepsze zarządzanie energią, lepsza grafika, mniej dziwnych bugów przy usypianiu. Na T14 wszystko działa od razu: WiFi, uśpienie, czytnik linii papilarnych, klawisze funkcyjne, wszystko.</p>
+    <p><strong>KDE Plasma</strong> to pulpit dla ludzi, którzy naprawdę konfigurują. Jest szybki, nie wchodzi w drogę, a kiedy chcę coś zmienić, jest do tego ustawienie zamiast rozszerzenia GNOME, które psuje się co wydanie. Plasma na 6-rdzeniowej maszynie z 32 GB RAM działa błyskawicznie.</p>
+    <p>Ta kombinacja jest nudna w najlepszym sensie. Nie walczę z systemem. Otwieram terminal i biorę się do pracy.</p>
+
+    <h2>Do czego naprawdę go używam</h2>
+    <p>Ten laptop to centrum dowodzenia całego mojego homelabu:</p>
+    <ul>
+      <li><strong>SSH do klastra Proxmox</strong> — dwa węzły plus Proxmox Backup Server, wszystko zarządzane z tej klawiatury</li>
+      <li><strong>kubectl do mojego klastra K3s</strong> — który hostuje m.in. moją stronę portfolio</li>
+      <li><strong>Terraform, Docker, Ansible</strong> — całe narzędzia IaC i kontenerowe działają lokalnie</li>
+      <li><strong>Tailscale</strong> — cały lab jest osiągalny skądkolwiek, a ten laptop to klient, którego używam najczęściej</li>
+      <li><strong>Obsidian</strong> do dokumentacji i notatek</li>
+      <li><strong>Przygotowanie do certyfikacji</strong> — laby, egzaminy próbne i niekończące się ćwiczenia w terminalu</li>
+    </ul>
+    <p>Prawdziwa linuksowa maszyna jako codzienny sprzęt zmienia sposób nauki. Każdy problem to okazja do ćwiczeń: sieć, systemd, storage, uprawnienia. Tego doświadczenia nie podrobisz w VM-ce otwieranej dwa razy w tygodniu.</p>
+
+    <h2>Upgrade do 32 GB</h2>
+    <p>Jeśli masz taki laptop: maksymalizuj RAM. T14 Gen 1 AMD ma jeden slot wlutowany i jeden SODIMM. 32 GB łącznie oznacza, że lokalne VM-ki, przeglądarka ze zbyt wieloma kartami, kontenery i IDE działają jednocześnie bez dotykania swapa. Ceny SODIMM-ów DDR4 są dziś śmieszne — to najtańszy upgrade jakości życia w informatyce.</p>
+    <p>Wymiana pasty to drugi. Te maszyny mają często 4-5 lat i fabryczną pastę. Świeża pasta plus odkurzenie przywraca wydajność, z jaką laptop opuścił fabrykę.</p>
+
+    <h2>Werdykt</h2>
+    <p>Używany biznesowy ThinkPad + Fedora KDE + tani upgrade RAM-u = linuksowa stacja robocza bijąca daleko powyżej swojej ceny. Jeśli wchodzisz w Linuksa, DevOps albo homelabbing i zastanawiasz się, na czym to wszystko uruchomić — to jest odpowiedź. Nie kombinuj.</p>
+  </div>
+
+  <div class="art-footer">
+    <a href="n100-nas.html"><span class="lang-en">← PREV: N100 NAS BUILD</span><span class="lang-de">← ZURÜCK: N100-NAS</span><span class="lang-pl">← POPRZEDNI: NAS NA N100</span></a>
+    <a href="../blog.html"><span class="lang-en">ALL POSTS →</span><span class="lang-de">ALLE BEITRÄGE →</span><span class="lang-pl">WSZYSTKIE WPISY →</span></a>
+  </div>
+</article>
+
+<footer>
+  <p>© 2026 <span>Lootregen</span> · <span class="lang-en">Self-hosted in Switzerland</span><span class="lang-de">Selbst gehostet in der Schweiz</span><span class="lang-pl">Hostowane samodzielnie w Szwajcarii</span></p>
+
+  <div class="footer-links">
+    <a onclick="openLegal('privacy')"><span class="lang-en">Privacy Policy</span><span class="lang-de">Datenschutz</span><span class="lang-pl">Polityka prywatności</span></a>
+    <a onclick="openLegal('impressum')">Impressum</a>
+  </div>
+</footer>
+
+</body>
+</html>

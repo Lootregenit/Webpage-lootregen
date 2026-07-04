@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<!--
+  ═══════════════════════════════════════════════════════════════
+  LOOTREGEN BLOG — POST LISTING
+  All blog posts, newest first. Shares language + theme
+  settings with the main page via localStorage.
+
+  Author   : Mateusz Mirosław Woźniak ("Lootregen")
+  Website  : https://lootregen.com
+  Hosting  : Self-hosted · Proxmox + K3s · Switzerland
+  License  : © 2026 Lootregen. All rights reserved.
+             Code structure may be referenced for learning;
+             content and branding may not be copied.
+  Updated  : July 2026
+  ═══════════════════════════════════════════════════════════════
+-->
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog · Lootregen</title>
+<meta name="description" content="Transmission log — notes on Proxmox, Kubernetes, Docker and homelab infrastructure by Lootregen.">
+<meta name="robots" content="index, follow">
+<link rel="stylesheet" href="fonts-inlined.css">
+<link rel="stylesheet" href="blog.css">
+<script src="blog-lang.js"></script>
+<script src="blog-legal.js" defer></script>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">Loot<span>regen</span></a>
+  <div class="nav-menu">
+    <a href="index.html#implants"><span class="lang-en">Tech Stack</span><span class="lang-de">Tech-Stack</span><span class="lang-pl">Tech Stack</span></a>
+    <a href="index.html#contracts"><span class="lang-en">Certifications</span><span class="lang-de">Zertifikate</span><span class="lang-pl">Certyfikaty</span></a>
+    <a href="index.html#skilltree"><span class="lang-en">Skill Tree</span><span class="lang-de">Skilltree</span><span class="lang-pl">Drzewo Umiejętności</span></a>
+    <a href="index.html#homelab">Homelab</a>
+    <a href="index.html#projects"><span class="lang-en">Projects</span><span class="lang-de">Projekte</span><span class="lang-pl">Projekty</span></a>
+    <a class="current" href="blog.html">Blog</a>
+    <a href="index.html#contact"><span class="lang-en">Contact</span><span class="lang-de">Kontakt</span><span class="lang-pl">Kontakt</span></a>
+  </div>
+  <div class="nav-r">
+    <div class="lang-btns">
+      <button class="lbtn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lbtn" data-lang="de" onclick="setLang('de')">DE</button>
+      <button class="lbtn" data-lang="pl" onclick="setLang('pl')">PL</button>
+    </div>
+    <button class="tbtn" id="tbtn" onclick="toggleBlogTheme()" title="Toggle theme" aria-label="Toggle light / dark theme">☀</button>
+    <a class="nav-back" href="index.html"><span class="lang-en">← BACK TO MAIN</span><span class="lang-de">← ZUR HAUPTSEITE</span><span class="lang-pl">← STRONA GŁÓWNA</span></a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="blog-label"><span class="lang-en">// Transmission Log</span><span class="lang-de">// Übertragungsprotokoll</span><span class="lang-pl">// Dziennik Transmisji</span></div>
+  <h1 class="page-title">Blog</h1>
+  <p class="blog-sub">
+    <span class="lang-en">Notes from the homelab — Proxmox, Kubernetes, Docker, certs and whatever breaks at 2 AM. Written by a human, hosted on his own hardware.</span>
+    <span class="lang-de">Notizen aus dem Homelab — Proxmox, Kubernetes, Docker, Zertifikate und alles, was um 2 Uhr nachts kaputtgeht. Von einem Menschen geschrieben, auf eigener Hardware gehostet.</span>
+    <span class="lang-pl">Notatki z homelabu — Proxmox, Kubernetes, Docker, certyfikaty i wszystko, co psuje się o 2 w nocy. Pisane przez człowieka, hostowane na własnym sprzęcie.</span>
+  </p>
+
+  <a class="post" href="posts/fedora-thinkpad.html">
+    <div class="post-meta"><span>2026-07-04</span><span class="tag">#linux #fedora</span><span><span class="lang-en">5 min read</span><span class="lang-de">5 Min. Lesezeit</span><span class="lang-pl">5 min czytania</span></span></div>
+    <div class="post-title"><span class="lang-en">My Daily Driver: A ThinkPad T14 Gen 1 AMD Running Fedora KDE</span><span class="lang-de">Mein Daily Driver: Ein ThinkPad T14 Gen 1 AMD mit Fedora KDE</span><span class="lang-pl">Mój codzienny sprzęt: ThinkPad T14 Gen 1 AMD z Fedorą KDE</span></div>
+    <p class="post-excerpt"><span class="lang-en">The used ThinkPad + Fedora combo is a cliché for a reason — it just works.</span><span class="lang-de">Die Kombi gebrauchtes ThinkPad + Fedora ist aus gutem Grund ein Klischee — sie funktioniert einfach.</span><span class="lang-pl">Używany ThinkPad + Fedora to klisza nie bez powodu — po prostu działa.</span></p>
+  </a>
+
+  <a class="post" href="posts/n100-nas.html">
+    <div class="post-meta"><span>2026-07-01</span><span class="tag">#nas #storage</span><span><span class="lang-en">5 min read</span><span class="lang-de">5 Min. Lesezeit</span><span class="lang-pl">5 min czytania</span></span></div>
+    <div class="post-title"><span class="lang-en">Building a Silent, Low-Power NAS on an Intel N100</span><span class="lang-de">Ein leiser, sparsamer Eigenbau-NAS auf Intel N100</span><span class="lang-pl">Cichy, energooszczędny NAS własnej roboty na Intelu N100</span></div>
+    <p class="post-excerpt"><span class="lang-en">Why I skipped Synology and built my own storage box for a fraction of the price.</span><span class="lang-de">Warum ich Synology übersprungen und mir für einen Bruchteil des Preises eine eigene Storage-Box gebaut habe.</span><span class="lang-pl">Dlaczego pominąłem Synology i zbudowałem własny serwer plików za ułamek ceny.</span></p>
+  </a>
+
+  <a class="post" href="posts/homelab-part-2.html">
+    <div class="post-meta"><span>2026-06-24</span><span class="tag">#proxmox #homelab</span><span><span class="lang-en">8 min read</span><span class="lang-de">8 Min. Lesezeit</span><span class="lang-pl">8 min czytania</span></span></div>
+    <div class="post-title"><span class="lang-en">Homelab Part 2: The Raspberry Pi Tiebreaker and a 40Gbps Thunderbolt Cluster Link</span><span class="lang-de">Homelab Teil 2: Der Raspberry Pi als Zünglein an der Waage und ein 40-Gbps-Thunderbolt-Clusterlink</span><span class="lang-pl">Homelab część 2: Raspberry Pi jako rozjemca i łącze klastrowe Thunderbolt 40 Gb/s</span></div>
+    <p class="post-excerpt"><span class="lang-en">How a €30 Pi keeps my cluster honest, and how two laptops got a 40Gbps interconnect without a single expensive switch.</span><span class="lang-de">Wie ein 30-€-Pi meinen Cluster ehrlich hält — und wie zwei Laptops zu einem 40-Gbps-Interconnect kamen, ganz ohne teuren Switch.</span><span class="lang-pl">Jak Pi za 30 € pilnuje uczciwości klastra i jak dwa laptopy dostały łącze 40 Gb/s bez ani jednego drogiego switcha.</span></p>
+  </a>
+
+  <a class="post" href="posts/homelab-part-1.html">
+    <div class="post-meta"><span>2026-06-10</span><span class="tag">#proxmox #homelab</span><span><span class="lang-en">6 min read</span><span class="lang-de">6 Min. Lesezeit</span><span class="lang-pl">6 min czytania</span></span></div>
+    <div class="post-title"><span class="lang-en">Homelab Part 1: Base Setup, Installing Proxmox, and Getting Backups Running</span><span class="lang-de">Homelab Teil 1: Grundsetup, Proxmox-Installation und laufende Backups</span><span class="lang-pl">Homelab część 1: Konfiguracja bazowa, instalacja Proxmoxa i działające backupy</span></div>
+    <p class="post-excerpt"><span class="lang-en">The unglamorous first step every homelab needs — before containers, before Kubernetes, before anything fun.</span><span class="lang-de">Der unglamouröse erste Schritt, den jedes Homelab braucht — vor Containern, vor Kubernetes, vor allem Spaß.</span><span class="lang-pl">Mało efektowny pierwszy krok, którego potrzebuje każdy homelab — przed kontenerami, przed Kubernetesem, przed całą zabawą.</span></p>
+  </a>
+</main>
+
+<footer>
+  <p>© 2026 <span>Lootregen</span> · <span class="lang-en">Self-hosted in Switzerland</span><span class="lang-de">Selbst gehostet in der Schweiz</span><span class="lang-pl">Hostowane samodzielnie w Szwajcarii</span></p>
+
+  <div class="footer-links">
+    <a onclick="openLegal('privacy')"><span class="lang-en">Privacy Policy</span><span class="lang-de">Datenschutz</span><span class="lang-pl">Polityka prywatności</span></a>
+    <a onclick="openLegal('impressum')">Impressum</a>
+  </div>
+</footer>
+
+</body>
+</html>

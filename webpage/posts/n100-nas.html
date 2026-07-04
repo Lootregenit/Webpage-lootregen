@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<!--
+  ═══════════════════════════════════════════════════════════════
+  BLOG POST — N100 NAS BUILD
+  DIY NAS: Intel N100, OpenMediaVault, mdadm RAID1 + bcache.
+  Trilingual: each language lives in its own .lang-* div.
+
+  Author   : Mateusz Mirosław Woźniak ("Lootregen")
+  Website  : https://lootregen.com
+  Hosting  : Self-hosted · Proxmox + K3s · Switzerland
+  License  : © 2026 Lootregen. All rights reserved.
+             Code structure may be referenced for learning;
+             content and branding may not be copied.
+  Updated  : July 2026
+  ═══════════════════════════════════════════════════════════════
+-->
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building a Silent, Low-Power NAS on an Intel N100 · Lootregen</title>
+<meta name="description" content="Skipping the Synology appliance tax: a DIY NAS on an Intel N100 with OpenMediaVault, mdadm RAID1 and a bcache SSD cache.">
+<link rel="stylesheet" href="../fonts-inlined.css">
+<link rel="stylesheet" href="../blog.css">
+<script src="../blog-lang.js"></script>
+<script src="../blog-legal.js" defer></script>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="../index.html">Loot<span>regen</span></a>
+  <div class="nav-menu">
+    <a href="../index.html#implants"><span class="lang-en">Tech Stack</span><span class="lang-de">Tech-Stack</span><span class="lang-pl">Tech Stack</span></a>
+    <a href="../index.html#contracts"><span class="lang-en">Certifications</span><span class="lang-de">Zertifikate</span><span class="lang-pl">Certyfikaty</span></a>
+    <a href="../index.html#skilltree"><span class="lang-en">Skill Tree</span><span class="lang-de">Skilltree</span><span class="lang-pl">Drzewo Umiejętności</span></a>
+    <a href="../index.html#homelab">Homelab</a>
+    <a href="../index.html#projects"><span class="lang-en">Projects</span><span class="lang-de">Projekte</span><span class="lang-pl">Projekty</span></a>
+    <a class="current" href="../blog.html">Blog</a>
+    <a href="../index.html#contact"><span class="lang-en">Contact</span><span class="lang-de">Kontakt</span><span class="lang-pl">Kontakt</span></a>
+  </div>
+  <div class="nav-r">
+    <div class="lang-btns">
+      <button class="lbtn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lbtn" data-lang="de" onclick="setLang('de')">DE</button>
+      <button class="lbtn" data-lang="pl" onclick="setLang('pl')">PL</button>
+    </div>
+    <button class="tbtn" id="tbtn" onclick="toggleBlogTheme()" title="Toggle theme" aria-label="Toggle light / dark theme">☀</button>
+    <a class="nav-back" href="../blog.html"><span class="lang-en">← ALL POSTS</span><span class="lang-de">← ALLE BEITRÄGE</span><span class="lang-pl">← WSZYSTKIE WPISY</span></a>
+  </div>
+</nav>
+
+<article>
+  <div class="art-meta"><span>2026-07-01</span><span class="tag">#nas #storage</span><span><span class="lang-en">5 min read</span><span class="lang-de">5 Min. Lesezeit</span><span class="lang-pl">5 min czytania</span></span></div>
+
+  <div class="lang-en">
+    <h1>Building a Silent, Low-Power NAS on an Intel N100</h1>
+    <p class="lede">Why I skipped Synology and built my own storage box for a fraction of the price.</p>
+
+    <p>Every homelab eventually hits the same wall: you have VMs, containers, backups, and ISOs scattered everywhere, and no central place to put them. I hit that wall with my two-node Proxmox cluster. The answer was a dedicated NAS — but instead of buying a Synology and paying the "appliance tax", I built one around an Intel N100 mini PC.</p>
+
+    <h2>Why the N100?</h2>
+    <p>The N100 is quietly one of the best homelab chips of the last few years:</p>
+    <ul>
+      <li><strong>4 efficiency cores</strong> that idle at almost nothing — the whole box sips single-digit watts most of the day</li>
+      <li><strong>Completely silent</strong> — no fan noise in the room where it lives</li>
+      <li><strong>Enough horsepower</strong> for SMB/NFS shares, RAID management, and a few light services on the side</li>
+      <li><strong>Cheap</strong> — the entire build cost less than an entry-level 2-bay Synology, with better specs</li>
+    </ul>
+    <p>For a NAS that mostly serves files and receives backups, you don't need a Ryzen. You need reliability and low idle power, because this thing runs 24/7.</p>
+
+    <h2>The Software Stack: OpenMediaVault</h2>
+    <p>I went with <strong>OpenMediaVault (OMV)</strong> on top of Debian. TrueNAS SCALE was the other candidate, but OMV won because:</p>
+    <ol>
+      <li>It's just Debian underneath — everything I know from Linux administration applies directly</li>
+      <li>No ZFS RAM hunger — important on a budget mini PC</li>
+      <li>Plugin ecosystem covers everything I need without bloat</li>
+    </ol>
+
+    <h2>Storage: mdadm RAID1 with a bcache Twist</h2>
+    <p>Here's where it gets interesting. The storage layout is a classic <strong>mdadm RAID1 mirror</strong> across two HDDs — boring, battle-tested, exactly what you want for data you care about.</p>
+    <p>But spinning disks are slow, especially for random I/O like Proxmox Backup Server chunks. So I put <strong>bcache</strong> in front of the array, using an SSD as a caching layer:</p>
+    <pre><code>NVMe/SSD (cache)  ──►  bcache  ──►  mdadm RAID1 (2× HDD)</code></pre>
+    <p>The result: hot data and metadata get SSD-class latency, while everything still lands on the redundant mirror underneath. Backup verification jobs that used to grind the disks now hit cache most of the time. It's the kind of setup that feels like cheating — HDD capacity and redundancy with SSD responsiveness where it matters.</p>
+    <p>A few lessons learned:</p>
+    <ul>
+      <li><strong>Set bcache to writethrough or writeback deliberately.</strong> Writeback is faster but means the cache SSD becomes part of your failure domain. Know what you're choosing.</li>
+      <li><strong>Monitor cache hit rates</strong> (<code>/sys/block/bcache0/bcache/stats_total/</code>) — if your hit rate is garbage, your cache is too small or your workload doesn't benefit.</li>
+      <li><strong>mdadm still needs monthly scrubs.</strong> RAID1 protects against a dead disk, not against silent bit rot you never check for.</li>
+    </ul>
+
+    <h2>What It Actually Does All Day</h2>
+    <ul>
+      <li><strong>Backup target</strong> for Proxmox Backup Server — all VM and container backups from the cluster land here</li>
+      <li><strong>SMB shares</strong> for general file storage</li>
+      <li><strong>ISO and template storage</strong> for the Proxmox nodes</li>
+    </ul>
+    <p>It's not glamorous. That's the point. The NAS is the one machine in my lab that I <em>don't</em> want to be interesting. It sits in the corner, stays silent, and holds everything that matters.</p>
+
+    <h2>Would I Do It Again?</h2>
+    <p>Absolutely. Total cost was well under what a prebuilt NAS with comparable compute would run, and I got full control over the stack — real Debian, real mdadm, real monitoring. If you're comfortable in a Linux shell, building your own NAS is one of the highest-value homelab projects you can do.</p>
+    <p>Next step on the roadmap: proper alerting when a disk starts throwing SMART errors, because RAID is not a backup and a mirror with one dead disk is just a countdown timer.</p>
+  </div>
+
+  <div class="lang-de">
+    <h1>Ein leiser, sparsamer Eigenbau-NAS auf Intel N100</h1>
+    <p class="lede">Warum ich Synology übersprungen und mir für einen Bruchteil des Preises eine eigene Storage-Box gebaut habe.</p>
+
+    <p>Jedes Homelab rennt irgendwann gegen dieselbe Wand: VMs, Container, Backups und ISOs liegen überall verstreut, und es gibt keinen zentralen Ort dafür. Ich bin mit meinem Zwei-Knoten-Proxmox-Cluster gegen diese Wand gelaufen. Die Antwort war ein dedizierter NAS — aber statt eine Synology zu kaufen und die „Appliance-Steuer" zu zahlen, habe ich einen um einen Intel-N100-Mini-PC herum gebaut.</p>
+
+    <h2>Warum der N100?</h2>
+    <p>Der N100 ist still und leise einer der besten Homelab-Chips der letzten Jahre:</p>
+    <ul>
+      <li><strong>4 Effizienzkerne</strong>, die im Leerlauf fast nichts verbrauchen — die ganze Kiste nuckelt den Großteil des Tages einstellige Watt</li>
+      <li><strong>Völlig lautlos</strong> — kein Lüfterrauschen im Raum, in dem er steht</li>
+      <li><strong>Genug Leistung</strong> für SMB/NFS-Freigaben, RAID-Verwaltung und ein paar leichte Dienste nebenbei</li>
+      <li><strong>Günstig</strong> — der komplette Eigenbau kostete weniger als eine Einsteiger-Synology mit 2 Schächten, bei besseren Spezifikationen</li>
+    </ul>
+    <p>Für einen NAS, der hauptsächlich Dateien ausliefert und Backups entgegennimmt, braucht es keinen Ryzen. Es braucht Zuverlässigkeit und niedrigen Leerlaufverbrauch, denn das Ding läuft 24/7.</p>
+
+    <h2>Der Software-Stack: OpenMediaVault</h2>
+    <p>Ich habe mich für <strong>OpenMediaVault (OMV)</strong> auf Debian entschieden. TrueNAS SCALE war der andere Kandidat, aber OMV hat gewonnen, weil:</p>
+    <ol>
+      <li>Darunter steckt schlicht Debian — alles, was ich aus der Linux-Administration kenne, gilt direkt</li>
+      <li>Kein ZFS-RAM-Hunger — wichtig auf einem Budget-Mini-PC</li>
+      <li>Das Plugin-Ökosystem deckt alles ab, was ich brauche, ohne Ballast</li>
+    </ol>
+
+    <h2>Storage: mdadm RAID1 mit bcache-Kniff</h2>
+    <p>Hier wird es interessant. Das Storage-Layout ist ein klassischer <strong>mdadm-RAID1-Spiegel</strong> über zwei HDDs — langweilig, kampferprobt, genau das Richtige für Daten, die einem wichtig sind.</p>
+    <p>Aber drehende Platten sind langsam, besonders bei zufälligem I/O wie den Chunks des Proxmox Backup Servers. Also habe ich <strong>bcache</strong> vor das Array gesetzt, mit einer SSD als Cache-Schicht:</p>
+    <pre><code>NVMe/SSD (Cache)  ──►  bcache  ──►  mdadm RAID1 (2× HDD)</code></pre>
+    <p>Das Ergebnis: Heiße Daten und Metadaten bekommen SSD-Latenz, während alles weiterhin auf dem redundanten Spiegel darunter landet. Backup-Verifikationsjobs, die früher die Platten malträtiert haben, treffen jetzt meistens den Cache. Es ist die Art Setup, die sich wie Schummeln anfühlt — HDD-Kapazität und -Redundanz mit SSD-Reaktionsfreude dort, wo es zählt.</p>
+    <p>Ein paar gelernte Lektionen:</p>
+    <ul>
+      <li><strong>bcache bewusst auf writethrough oder writeback stellen.</strong> Writeback ist schneller, macht die Cache-SSD aber zum Teil der Fehlerdomäne. Man sollte wissen, was man wählt.</li>
+      <li><strong>Cache-Trefferquoten überwachen</strong> (<code>/sys/block/bcache0/bcache/stats_total/</code>) — ist die Trefferquote Mist, ist der Cache zu klein oder der Workload profitiert nicht.</li>
+      <li><strong>mdadm braucht weiterhin monatliche Scrubs.</strong> RAID1 schützt vor einer toten Platte, nicht vor stillem Bit Rot, den man nie prüft.</li>
+    </ul>
+
+    <h2>Was er den ganzen Tag wirklich tut</h2>
+    <ul>
+      <li><strong>Backup-Ziel</strong> für den Proxmox Backup Server — alle VM- und Container-Backups des Clusters landen hier</li>
+      <li><strong>SMB-Freigaben</strong> für allgemeine Dateiablage</li>
+      <li><strong>ISO- und Template-Speicher</strong> für die Proxmox-Knoten</li>
+    </ul>
+    <p>Glamourös ist das nicht. Genau darum geht es. Der NAS ist die eine Maschine in meinem Lab, die ich <em>nicht</em> interessant haben will. Er steht in der Ecke, bleibt still und hält alles, was zählt.</p>
+
+    <h2>Würde ich es wieder tun?</h2>
+    <p>Absolut. Die Gesamtkosten lagen deutlich unter dem, was ein Fertig-NAS mit vergleichbarer Rechenleistung kostet, und ich habe volle Kontrolle über den Stack — echtes Debian, echtes mdadm, echtes Monitoring. Wer sich in einer Linux-Shell wohlfühlt, für den ist der NAS-Eigenbau eines der lohnendsten Homelab-Projekte überhaupt.</p>
+    <p>Nächster Schritt auf der Roadmap: ordentliches Alerting, wenn eine Platte SMART-Fehler wirft — denn RAID ist kein Backup, und ein Spiegel mit einer toten Platte ist nur ein Countdown.</p>
+  </div>
+
+  <div class="lang-pl">
+    <h1>Cichy, energooszczędny NAS własnej roboty na Intelu N100</h1>
+    <p class="lede">Dlaczego pominąłem Synology i zbudowałem własny serwer plików za ułamek ceny.</p>
+
+    <p>Każdy homelab w końcu uderza w tę samą ścianę: masz VM-ki, kontenery, backupy i ISO porozrzucane wszędzie i żadnego centralnego miejsca, żeby je trzymać. Ja uderzyłem w tę ścianę z moim dwuwęzłowym klastrem Proxmoxa. Odpowiedzią był dedykowany NAS — ale zamiast kupować Synology i płacić „podatek od gotowca", zbudowałem własny wokół mini PC z Intelem N100.</p>
+
+    <h2>Dlaczego N100?</h2>
+    <p>N100 to po cichu jeden z najlepszych homelabowych procesorów ostatnich lat:</p>
+    <ul>
+      <li><strong>4 rdzenie efektywnościowe</strong>, które w spoczynku nie pobierają prawie nic — całe pudełko przez większość dnia sączy jednocyfrowe waty</li>
+      <li><strong>Całkowita cisza</strong> — żadnego szumu wentylatora w pokoju, w którym stoi</li>
+      <li><strong>Wystarczająca moc</strong> do udziałów SMB/NFS, zarządzania RAID-em i kilku lekkich usług na boku</li>
+      <li><strong>Tanio</strong> — cała budowa kosztowała mniej niż podstawowe dwukieszeniowe Synology, przy lepszej specyfikacji</li>
+    </ul>
+    <p>Do NAS-a, który głównie serwuje pliki i przyjmuje backupy, nie potrzebujesz Ryzena. Potrzebujesz niezawodności i niskiego poboru w spoczynku, bo to urządzenie działa 24/7.</p>
+
+    <h2>Stos oprogramowania: OpenMediaVault</h2>
+    <p>Postawiłem na <strong>OpenMediaVault (OMV)</strong> na Debianie. Drugim kandydatem był TrueNAS SCALE, ale OMV wygrał, bo:</p>
+    <ol>
+      <li>Pod spodem to po prostu Debian — wszystko, co umiem z administracji Linuksem, przekłada się bezpośrednio</li>
+      <li>Brak głodu RAM-u znanego z ZFS — ważne na budżetowym mini PC</li>
+      <li>Ekosystem wtyczek pokrywa wszystko, czego potrzebuję, bez zbędnego balastu</li>
+    </ol>
+
+    <h2>Storage: mdadm RAID1 z twistem bcache</h2>
+    <p>Tu robi się ciekawie. Układ storage to klasyczne lustro <strong>mdadm RAID1</strong> na dwóch HDD — nudne, sprawdzone w boju, dokładnie to, czego chcesz dla danych, na których ci zależy.</p>
+    <p>Ale talerzowe dyski są wolne, szczególnie przy losowym I/O jak chunki Proxmox Backup Servera. Więc przed macierz wstawiłem <strong>bcache</strong>, z SSD jako warstwą cache:</p>
+    <pre><code>NVMe/SSD (cache)  ──►  bcache  ──►  mdadm RAID1 (2× HDD)</code></pre>
+    <p>Efekt: gorące dane i metadane dostają latencję klasy SSD, a wszystko i tak ląduje na redundantnym lustrze pod spodem. Zadania weryfikacji backupów, które kiedyś mieliły dyski, teraz najczęściej trafiają w cache. To ten rodzaj konfiguracji, który wydaje się oszukiwaniem — pojemność i redundancja HDD z responsywnością SSD tam, gdzie się liczy.</p>
+    <p>Kilka wyciągniętych lekcji:</p>
+    <ul>
+      <li><strong>Ustaw bcache na writethrough albo writeback świadomie.</strong> Writeback jest szybszy, ale oznacza, że SSD cache staje się częścią twojej domeny awarii. Wiedz, co wybierasz.</li>
+      <li><strong>Monitoruj trafienia cache</strong> (<code>/sys/block/bcache0/bcache/stats_total/</code>) — jeśli współczynnik trafień jest kiepski, cache jest za mały albo twój workload nie korzysta.</li>
+      <li><strong>mdadm nadal potrzebuje comiesięcznych scrubów.</strong> RAID1 chroni przed martwym dyskiem, nie przed cichą degradacją bitów, której nigdy nie sprawdzasz.</li>
+    </ul>
+
+    <h2>Co właściwie robi przez cały dzień</h2>
+    <ul>
+      <li><strong>Cel backupów</strong> dla Proxmox Backup Servera — lądują tu wszystkie backupy VM-ek i kontenerów z klastra</li>
+      <li><strong>Udziały SMB</strong> do ogólnego przechowywania plików</li>
+      <li><strong>Magazyn ISO i szablonów</strong> dla węzłów Proxmoxa</li>
+    </ul>
+    <p>To nie jest efektowne. I o to chodzi. NAS to jedyna maszyna w moim labie, która ma <em>nie być</em> interesująca. Stoi w kącie, milczy i trzyma wszystko, co ważne.</p>
+
+    <h2>Czy zrobiłbym to jeszcze raz?</h2>
+    <p>Zdecydowanie. Całkowity koszt był dużo niższy niż gotowy NAS o porównywalnej mocy, a dostałem pełną kontrolę nad stosem — prawdziwy Debian, prawdziwy mdadm, prawdziwy monitoring. Jeśli czujesz się swobodnie w linuksowej powłoce, budowa własnego NAS-a to jeden z najbardziej wartościowych projektów homelabowych.</p>
+    <p>Następny krok na mapie: porządne alertowanie, gdy dysk zacznie rzucać błędami SMART — bo RAID to nie backup, a lustro z jednym martwym dyskiem to tylko odliczanie.</p>
+  </div>
+
+  <div class="art-footer">
+    <a href="../blog.html"><span class="lang-en">← ALL POSTS</span><span class="lang-de">← ALLE BEITRÄGE</span><span class="lang-pl">← WSZYSTKIE WPISY</span></a>
+    <a href="fedora-thinkpad.html"><span class="lang-en">NEXT: FEDORA ON A THINKPAD →</span><span class="lang-de">WEITER: FEDORA AUF DEM THINKPAD →</span><span class="lang-pl">DALEJ: FEDORA NA THINKPADZIE →</span></a>
+  </div>
+</article>
+
+<footer>
+  <p>© 2026 <span>Lootregen</span> · <span class="lang-en">Self-hosted in Switzerland</span><span class="lang-de">Selbst gehostet in der Schweiz</span><span class="lang-pl">Hostowane samodzielnie w Szwajcarii</span></p>
+
+  <div class="footer-links">
+    <a onclick="openLegal('privacy')"><span class="lang-en">Privacy Policy</span><span class="lang-de">Datenschutz</span><span class="lang-pl">Polityka prywatności</span></a>
+    <a onclick="openLegal('impressum')">Impressum</a>
+  </div>
+</footer>
+
+</body>
+</html>

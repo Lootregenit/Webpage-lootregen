@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<!--
+  ═══════════════════════════════════════════════════════════════
+  BLOG POST — HOMELAB PART 1
+  Base setup: Proxmox installation, clustering, PBS backups.
+  Trilingual: each language lives in its own .lang-* div.
+
+  Author   : Mateusz Mirosław Woźniak ("Lootregen")
+  Website  : https://lootregen.com
+  Hosting  : Self-hosted · Proxmox + K3s · Switzerland
+  License  : © 2026 Lootregen. All rights reserved.
+             Code structure may be referenced for learning;
+             content and branding may not be copied.
+  Updated  : July 2026
+  ═══════════════════════════════════════════════════════════════
+-->
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homelab Part 1: Base Setup, Proxmox & Backups · Lootregen</title>
+<meta name="description" content="Installing Proxmox VE on two Dell Precision nodes, forming a cluster with a QDevice, and getting Proxmox Backup Server running.">
+<link rel="stylesheet" href="../fonts-inlined.css">
+<link rel="stylesheet" href="../blog.css">
+<script src="../blog-lang.js"></script>
+<script src="../blog-legal.js" defer></script>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="../index.html">Loot<span>regen</span></a>
+  <div class="nav-menu">
+    <a href="../index.html#implants"><span class="lang-en">Tech Stack</span><span class="lang-de">Tech-Stack</span><span class="lang-pl">Tech Stack</span></a>
+    <a href="../index.html#contracts"><span class="lang-en">Certifications</span><span class="lang-de">Zertifikate</span><span class="lang-pl">Certyfikaty</span></a>
+    <a href="../index.html#skilltree"><span class="lang-en">Skill Tree</span><span class="lang-de">Skilltree</span><span class="lang-pl">Drzewo Umiejętności</span></a>
+    <a href="../index.html#homelab">Homelab</a>
+    <a href="../index.html#projects"><span class="lang-en">Projects</span><span class="lang-de">Projekte</span><span class="lang-pl">Projekty</span></a>
+    <a class="current" href="../blog.html">Blog</a>
+    <a href="../index.html#contact"><span class="lang-en">Contact</span><span class="lang-de">Kontakt</span><span class="lang-pl">Kontakt</span></a>
+  </div>
+  <div class="nav-r">
+    <div class="lang-btns">
+      <button class="lbtn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lbtn" data-lang="de" onclick="setLang('de')">DE</button>
+      <button class="lbtn" data-lang="pl" onclick="setLang('pl')">PL</button>
+    </div>
+    <button class="tbtn" id="tbtn" onclick="toggleBlogTheme()" title="Toggle theme" aria-label="Toggle light / dark theme">☀</button>
+    <a class="nav-back" href="../blog.html"><span class="lang-en">← ALL POSTS</span><span class="lang-de">← ALLE BEITRÄGE</span><span class="lang-pl">← WSZYSTKIE WPISY</span></a>
+  </div>
+</nav>
+
+<article>
+  <div class="art-meta"><span>2026-06-10</span><span class="tag">#proxmox #homelab</span><span><span class="lang-en">6 min read</span><span class="lang-de">6 Min. Lesezeit</span><span class="lang-pl">6 min czytania</span></span></div>
+
+  <div class="lang-en">
+    <h1>Homelab Part 1: Base Setup, Installing Proxmox, and Getting Backups Running</h1>
+    <p class="lede">The unglamorous first step every homelab needs — before containers, before Kubernetes, before anything fun.</p>
+
+    <p>Every homelab blog starts with the cool stuff — Kubernetes dashboards, automation, self-hosted everything. Nobody writes about step one: getting hypervisors installed, configured properly, and backed up. So that's exactly what this post covers. Nothing more.</p>
+
+    <h2>The Hardware</h2>
+    <p>My cluster runs on two <strong>Dell Precision 3561</strong> workstation laptops:</p>
+    <ul>
+      <li><strong>pve-01</strong> — 192.168.1.100</li>
+      <li><strong>pve-02</strong> — 192.168.1.101</li>
+    </ul>
+    <p>Laptops as servers sound wrong until you think about it: built-in UPS (the battery), low power draw, silent, and compact. For a two-node learning cluster, they're ideal.</p>
+
+    <h2>Installing Proxmox VE</h2>
+    <p>Installation itself is the easy part — flash the Proxmox VE ISO to USB, boot, and follow the installer. The decisions that matter come during and right after:</p>
+    <p><strong>1. Filesystem.</strong> I went with the default ext4 on LVM-thin. ZFS is tempting, but on laptop hardware with limited RAM to spare for VMs, LVM-thin is the pragmatic choice. Thin provisioning means I can over-allocate disk space across VMs without committing it upfront.</p>
+    <p><strong>2. Static IPs from day one.</strong> Both nodes got fixed addresses (.100 and .101) in the installer. A hypervisor that changes IP is a hypervisor you can't find. Set it once, write it down, never touch it again.</p>
+    <p><strong>3. Hostname and FQDN.</strong> <code>pve-01</code> and <code>pve-02</code> — short, numbered, boring. Naming schemes that seem clever today are annoying in six months.</p>
+
+    <h2>Post-Install Base Config</h2>
+    <p>Fresh Proxmox needs a few things before it's actually usable:</p>
+    <p><strong>Repositories.</strong> Out of the box, Proxmox points at the enterprise repo, which fails without a subscription. Switch to the no-subscription repo:</p>
+    <pre><code># Disable enterprise repo, enable no-subscription
+sed -i "s/^deb/#deb/" /etc/apt/sources.list.d/pve-enterprise.list
+echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" \
+  > /etc/apt/sources.list.d/pve-no-subscription.list
+apt update && apt full-upgrade -y</code></pre>
+    <p><strong>Updates first, everything else second.</strong> Run a full upgrade and reboot before creating a single VM. Migrating VMs around later just to patch the host is avoidable pain.</p>
+    <p><strong>Cluster creation.</strong> With both nodes installed and updated, forming the cluster takes two commands — <code>pvecm create</code> on the first node, <code>pvecm add</code> on the second. After that, one web UI manages both machines.</p>
+    <p><strong>The quorum problem.</strong> A two-node cluster has a built-in flaw: if one node dies, the survivor has no majority and refuses to do cluster operations. The fix is a <strong>QDevice</strong> — a third vote that doesn't need to be a full Proxmox node. In my case, a Raspberry Pi 3 runs <code>corosync-qnetd</code> and acts as the tiebreaker. It does nothing except vote, and that's enough to keep the cluster functional when a node is down.</p>
+    <pre><code># On the cluster, after setting up the Pi:
+pvecm qdevice setup &lt;pi-ip&gt;</code></pre>
+
+    <h2>Backups: Proxmox Backup Server</h2>
+    <p>A homelab without backups is a time bomb with a web UI. Before deploying anything I'd miss, I set up <strong>Proxmox Backup Server (PBS)</strong> — running as a VM (VMID 110) on the cluster itself.</p>
+    <p>Yes, running the backup server <em>on</em> the infrastructure it backs up is a compromise. The important part: the actual backup <strong>datastore lives on separate storage</strong>, not on the cluster's own disks. If a node dies, the backups survive; PBS itself can be reinstalled in twenty minutes.</p>
+    <p>Why PBS instead of plain vzdump backups to a directory?</p>
+    <ul>
+      <li><strong>Deduplication</strong> — dozens of backup snapshots take a fraction of the raw space, because unchanged chunks are stored once</li>
+      <li><strong>Incremental backups</strong> — after the first full backup, only changed blocks transfer. Nightly backups finish in minutes</li>
+      <li><strong>Verification jobs</strong> — PBS periodically re-checks stored chunks against their checksums, so I find corruption before I need a restore</li>
+      <li><strong>Pruning policies</strong> — keep-last, keep-daily, keep-weekly configured once, enforced automatically</li>
+    </ul>
+    <p>Hooking it up is straightforward: add PBS as storage in the Proxmox datacenter, create a backup job covering all VMs, schedule it nightly, done.</p>
+    <p>The rule I follow: <strong>no workload exists until it's covered by the backup job.</strong> New VM, new container — it goes into the backup schedule the same day it's created.</p>
+
+    <h2>Where This Leaves Things</h2>
+    <p>At the end of step one, the foundation is:</p>
+    <ul>
+      <li>Two Proxmox nodes, patched, static IPs, clustered</li>
+      <li>A QDevice keeping quorum honest</li>
+      <li>PBS running nightly deduplicated backups with verification</li>
+    </ul>
+    <p>No services yet. No containers. Nothing exciting. But everything that comes next — and there's a lot coming — sits on top of this, and gets backed up from day one.</p>
+    <p>That's the whole point of step one: make the boring layer solid, so you never have to think about it again.</p>
+  </div>
+
+  <div class="lang-de">
+    <h1>Homelab Teil 1: Grundsetup, Proxmox-Installation und laufende Backups</h1>
+    <p class="lede">Der unglamouröse erste Schritt, den jedes Homelab braucht — vor Containern, vor Kubernetes, vor allem Spaß.</p>
+
+    <p>Jeder Homelab-Blog beginnt mit den coolen Sachen — Kubernetes-Dashboards, Automatisierung, alles self-hosted. Niemand schreibt über Schritt eins: Hypervisoren installieren, sauber konfigurieren und sichern. Genau darum geht es in diesem Beitrag. Um nichts anderes.</p>
+
+    <h2>Die Hardware</h2>
+    <p>Mein Cluster läuft auf zwei <strong>Dell Precision 3561</strong> Workstation-Laptops:</p>
+    <ul>
+      <li><strong>pve-01</strong> — 192.168.1.100</li>
+      <li><strong>pve-02</strong> — 192.168.1.101</li>
+    </ul>
+    <p>Laptops als Server klingen falsch, bis man darüber nachdenkt: eingebaute USV (der Akku), geringer Stromverbrauch, lautlos und kompakt. Für einen Zwei-Knoten-Lerncluster sind sie ideal.</p>
+
+    <h2>Proxmox VE installieren</h2>
+    <p>Die Installation selbst ist der einfache Teil — Proxmox-VE-ISO auf USB flashen, booten, dem Installer folgen. Die Entscheidungen, die zählen, kommen währenddessen und direkt danach:</p>
+    <p><strong>1. Dateisystem.</strong> Ich habe das Standard-ext4 auf LVM-thin gewählt. ZFS ist verlockend, aber auf Laptop-Hardware mit knappem RAM für VMs ist LVM-thin die pragmatische Wahl. Thin Provisioning heißt, ich kann Speicherplatz über VMs hinweg überbuchen, ohne ihn vorab festzulegen.</p>
+    <p><strong>2. Statische IPs ab Tag eins.</strong> Beide Knoten bekamen im Installer feste Adressen (.100 und .101). Ein Hypervisor, der die IP wechselt, ist ein Hypervisor, den man nicht findet. Einmal setzen, aufschreiben, nie wieder anfassen.</p>
+    <p><strong>3. Hostname und FQDN.</strong> <code>pve-01</code> und <code>pve-02</code> — kurz, nummeriert, langweilig. Namensschemata, die heute clever wirken, nerven in sechs Monaten.</p>
+
+    <h2>Basiskonfiguration nach der Installation</h2>
+    <p>Ein frisches Proxmox braucht ein paar Dinge, bevor es wirklich nutzbar ist:</p>
+    <p><strong>Repositories.</strong> Ab Werk zeigt Proxmox auf das Enterprise-Repo, das ohne Subscription fehlschlägt. Also auf das No-Subscription-Repo umstellen:</p>
+    <pre><code># Enterprise-Repo deaktivieren, No-Subscription aktivieren
+sed -i "s/^deb/#deb/" /etc/apt/sources.list.d/pve-enterprise.list
+echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" \
+  > /etc/apt/sources.list.d/pve-no-subscription.list
+apt update && apt full-upgrade -y</code></pre>
+    <p><strong>Erst Updates, dann alles andere.</strong> Vollständiges Upgrade fahren und neu starten, bevor auch nur eine VM erstellt wird. VMs später herumzuschieben, nur um den Host zu patchen, ist vermeidbarer Schmerz.</p>
+    <p><strong>Cluster erstellen.</strong> Sind beide Knoten installiert und aktuell, braucht der Cluster zwei Befehle — <code>pvecm create</code> auf dem ersten Knoten, <code>pvecm add</code> auf dem zweiten. Danach verwaltet eine Web-UI beide Maschinen.</p>
+    <p><strong>Das Quorum-Problem.</strong> Ein Zwei-Knoten-Cluster hat einen eingebauten Makel: Stirbt ein Knoten, hat der Überlebende keine Mehrheit und verweigert Cluster-Operationen. Die Lösung ist ein <strong>QDevice</strong> — eine dritte Stimme, die kein vollwertiger Proxmox-Knoten sein muss. Bei mir läuft <code>corosync-qnetd</code> auf einem Raspberry Pi 3, der als Zünglein an der Waage dient. Er tut nichts außer abstimmen — und das reicht, damit der Cluster funktionsfähig bleibt, wenn ein Knoten ausfällt.</p>
+    <pre><code># Auf dem Cluster, nachdem der Pi eingerichtet ist:
+pvecm qdevice setup &lt;pi-ip&gt;</code></pre>
+
+    <h2>Backups: Proxmox Backup Server</h2>
+    <p>Ein Homelab ohne Backups ist eine Zeitbombe mit Web-UI. Bevor ich irgendetwas deploye, das ich vermissen würde, habe ich den <strong>Proxmox Backup Server (PBS)</strong> aufgesetzt — als VM (VMID 110) auf dem Cluster selbst.</p>
+    <p>Ja, den Backup-Server <em>auf</em> der Infrastruktur zu betreiben, die er sichert, ist ein Kompromiss. Entscheidend: Der eigentliche <strong>Datastore liegt auf separatem Speicher</strong>, nicht auf den Disks des Clusters. Stirbt ein Knoten, überleben die Backups; PBS selbst ist in zwanzig Minuten neu installiert.</p>
+    <p>Warum PBS statt schlichter vzdump-Backups in ein Verzeichnis?</p>
+    <ul>
+      <li><strong>Deduplizierung</strong> — Dutzende Backup-Snapshots belegen einen Bruchteil des Rohplatzes, weil unveränderte Chunks nur einmal gespeichert werden</li>
+      <li><strong>Inkrementelle Backups</strong> — nach dem ersten Voll-Backup werden nur geänderte Blöcke übertragen. Nächtliche Backups sind in Minuten fertig</li>
+      <li><strong>Verifikationsjobs</strong> — PBS prüft gespeicherte Chunks regelmäßig gegen ihre Prüfsummen; Korruption fällt auf, bevor ein Restore nötig ist</li>
+      <li><strong>Pruning-Richtlinien</strong> — keep-last, keep-daily, keep-weekly einmal konfiguriert, automatisch durchgesetzt</li>
+    </ul>
+    <p>Das Anbinden ist unkompliziert: PBS als Storage im Proxmox-Datacenter hinzufügen, einen Backup-Job über alle VMs anlegen, nächtlich einplanen, fertig.</p>
+    <p>Meine Regel: <strong>Kein Workload existiert, bevor er vom Backup-Job abgedeckt ist.</strong> Neue VM, neuer Container — kommt am selben Tag in den Backup-Zeitplan.</p>
+
+    <h2>Wo das hinführt</h2>
+    <p>Am Ende von Schritt eins steht das Fundament:</p>
+    <ul>
+      <li>Zwei Proxmox-Knoten, gepatcht, statische IPs, geclustert</li>
+      <li>Ein QDevice, das das Quorum ehrlich hält</li>
+      <li>PBS mit nächtlichen deduplizierten Backups inklusive Verifikation</li>
+    </ul>
+    <p>Noch keine Dienste. Keine Container. Nichts Aufregendes. Aber alles, was als Nächstes kommt — und da kommt viel — sitzt auf dieser Basis und wird ab Tag eins gesichert.</p>
+    <p>Genau das ist der Sinn von Schritt eins: die langweilige Schicht solide bauen, damit man nie wieder über sie nachdenken muss.</p>
+  </div>
+
+  <div class="lang-pl">
+    <h1>Homelab część 1: Konfiguracja bazowa, instalacja Proxmoxa i działające backupy</h1>
+    <p class="lede">Mało efektowny pierwszy krok, którego potrzebuje każdy homelab — przed kontenerami, przed Kubernetesem, przed całą zabawą.</p>
+
+    <p>Każdy blog o homelabie zaczyna się od fajnych rzeczy — dashboardy Kubernetesa, automatyzacja, wszystko self-hosted. Nikt nie pisze o kroku pierwszym: zainstalowaniu hipernadzorców, porządnej konfiguracji i backupach. I dokładnie o tym jest ten wpis. O niczym więcej.</p>
+
+    <h2>Sprzęt</h2>
+    <p>Mój klaster działa na dwóch laptopach workstation <strong>Dell Precision 3561</strong>:</p>
+    <ul>
+      <li><strong>pve-01</strong> — 192.168.1.100</li>
+      <li><strong>pve-02</strong> — 192.168.1.101</li>
+    </ul>
+    <p>Laptopy jako serwery brzmią źle, dopóki się nad tym nie zastanowisz: wbudowany UPS (bateria), niski pobór prądu, cisza i kompaktowość. Do dwuwęzłowego klastra do nauki są idealne.</p>
+
+    <h2>Instalacja Proxmox VE</h2>
+    <p>Sama instalacja to łatwa część — wgraj ISO Proxmox VE na USB, uruchom i podążaj za instalatorem. Decyzje, które się liczą, zapadają w trakcie i tuż po niej:</p>
+    <p><strong>1. System plików.</strong> Wybrałem domyślny ext4 na LVM-thin. ZFS kusi, ale na sprzęcie laptopowym z ograniczonym RAM-em dla VM-ek LVM-thin to pragmatyczny wybór. Thin provisioning oznacza, że mogę nadprzydzielać przestrzeń dyskową między VM-kami bez rezerwowania jej z góry.</p>
+    <p><strong>2. Statyczne IP od pierwszego dnia.</strong> Oba węzły dostały stałe adresy (.100 i .101) już w instalatorze. Hipernadzorca, który zmienia IP, to hipernadzorca, którego nie można znaleźć. Ustaw raz, zapisz, nie ruszaj nigdy więcej.</p>
+    <p><strong>3. Hostname i FQDN.</strong> <code>pve-01</code> i <code>pve-02</code> — krótko, numerycznie, nudno. Schematy nazewnictwa, które dziś wydają się sprytne, za pół roku irytują.</p>
+
+    <h2>Konfiguracja bazowa po instalacji</h2>
+    <p>Świeży Proxmox potrzebuje kilku rzeczy, zanim będzie naprawdę używalny:</p>
+    <p><strong>Repozytoria.</strong> Fabrycznie Proxmox wskazuje na repozytorium enterprise, które bez subskrypcji nie działa. Przełącz na repozytorium no-subscription:</p>
+    <pre><code># Wyłącz repo enterprise, włącz no-subscription
+sed -i "s/^deb/#deb/" /etc/apt/sources.list.d/pve-enterprise.list
+echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" \
+  > /etc/apt/sources.list.d/pve-no-subscription.list
+apt update && apt full-upgrade -y</code></pre>
+    <p><strong>Najpierw aktualizacje, potem cała reszta.</strong> Pełny upgrade i restart, zanim powstanie choćby jedna VM. Przenoszenie VM-ek później tylko po to, żeby załatać hosta, to ból, którego można uniknąć.</p>
+    <p><strong>Tworzenie klastra.</strong> Gdy oba węzły są zainstalowane i zaktualizowane, utworzenie klastra to dwa polecenia — <code>pvecm create</code> na pierwszym węźle, <code>pvecm add</code> na drugim. Od tej chwili jeden interfejs webowy zarządza oboma maszynami.</p>
+    <p><strong>Problem kworum.</strong> Klaster dwuwęzłowy ma wbudowaną wadę: gdy jeden węzeł padnie, ocalały nie ma większości i odmawia operacji klastrowych. Rozwiązaniem jest <strong>QDevice</strong> — trzeci głos, który nie musi być pełnoprawnym węzłem Proxmoxa. U mnie <code>corosync-qnetd</code> działa na Raspberry Pi 3, pełniącym rolę rozjemcy. Nie robi nic poza głosowaniem — i to wystarcza, by klaster działał, gdy węzeł jest niedostępny.</p>
+    <pre><code># Na klastrze, po skonfigurowaniu Pi:
+pvecm qdevice setup &lt;pi-ip&gt;</code></pre>
+
+    <h2>Backupy: Proxmox Backup Server</h2>
+    <p>Homelab bez backupów to bomba zegarowa z interfejsem webowym. Zanim wdrożyłem cokolwiek, czego byłoby mi szkoda, postawiłem <strong>Proxmox Backup Server (PBS)</strong> — jako VM (VMID 110) na samym klastrze.</p>
+    <p>Tak, uruchamianie serwera backupów <em>na</em> infrastrukturze, którą on sam zabezpiecza, to kompromis. Najważniejsze: właściwy <strong>datastore leży na osobnym storage</strong>, nie na dyskach klastra. Gdy węzeł padnie, backupy przetrwają; sam PBS można przeinstalować w dwadzieścia minut.</p>
+    <p>Dlaczego PBS zamiast zwykłych backupów vzdump do katalogu?</p>
+    <ul>
+      <li><strong>Deduplikacja</strong> — dziesiątki snapshotów zajmują ułamek surowej przestrzeni, bo niezmienione fragmenty są przechowywane raz</li>
+      <li><strong>Backupy przyrostowe</strong> — po pierwszym pełnym backupie przesyłane są tylko zmienione bloki. Nocne backupy kończą się w minuty</li>
+      <li><strong>Zadania weryfikacji</strong> — PBS okresowo sprawdza zapisane fragmenty względem sum kontrolnych, więc korupcję znajduję zanim potrzebny będzie restore</li>
+      <li><strong>Polityki retencji</strong> — keep-last, keep-daily, keep-weekly skonfigurowane raz, egzekwowane automatycznie</li>
+    </ul>
+    <p>Podpięcie jest proste: dodaj PBS jako storage w datacenter Proxmoxa, utwórz zadanie backupu obejmujące wszystkie VM-ki, zaplanuj co noc, gotowe.</p>
+    <p>Zasada, której się trzymam: <strong>żaden workload nie istnieje, dopóki nie obejmuje go zadanie backupu.</strong> Nowa VM, nowy kontener — trafia do harmonogramu backupów tego samego dnia, w którym powstał.</p>
+
+    <h2>Co z tego wynika</h2>
+    <p>Na koniec kroku pierwszego fundament wygląda tak:</p>
+    <ul>
+      <li>Dwa węzły Proxmoxa, załatane, statyczne IP, w klastrze</li>
+      <li>QDevice pilnujące uczciwego kworum</li>
+      <li>PBS z nocnymi, deduplikowanymi backupami i weryfikacją</li>
+    </ul>
+    <p>Jeszcze żadnych usług. Żadnych kontenerów. Nic ekscytującego. Ale wszystko, co przyjdzie później — a przyjdzie sporo — siedzi na tym fundamencie i jest backupowane od pierwszego dnia.</p>
+    <p>O to właśnie chodzi w kroku pierwszym: zbudować nudną warstwę solidnie, żeby nigdy więcej nie trzeba było o niej myśleć.</p>
+  </div>
+
+  <div class="art-footer">
+    <a href="../blog.html"><span class="lang-en">← ALL POSTS</span><span class="lang-de">← ALLE BEITRÄGE</span><span class="lang-pl">← WSZYSTKIE WPISY</span></a>
+    <a href="homelab-part-2.html"><span class="lang-en">PART 2: PI TIEBREAKER &amp; THUNDERBOLT →</span><span class="lang-de">TEIL 2: PI &amp; THUNDERBOLT →</span><span class="lang-pl">CZĘŚĆ 2: PI I THUNDERBOLT →</span></a>
+  </div>
+</article>
+
+<footer>
+  <p>© 2026 <span>Lootregen</span> · <span class="lang-en">Self-hosted in Switzerland</span><span class="lang-de">Selbst gehostet in der Schweiz</span><span class="lang-pl">Hostowane samodzielnie w Szwajcarii</span></p>
+
+  <div class="footer-links">
+    <a onclick="openLegal('privacy')"><span class="lang-en">Privacy Policy</span><span class="lang-de">Datenschutz</span><span class="lang-pl">Polityka prywatności</span></a>
+    <a onclick="openLegal('impressum')">Impressum</a>
+  </div>
+</footer>
+
+</body>
+</html>
