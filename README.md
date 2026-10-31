@@ -2,12 +2,13 @@
 
 # 🌐 Lootregen
 
-**Self-hosted personal website on a home K3s cluster — zero open ports, zero exposed IPs.**
+**Self-hosted personal website on a 3-node K3s cluster — GitOps, zero open ports, zero exposed IPs.**
 
-[![K3s](https://img.shields.io/badge/K3s-Kubernetes-FFC61C?logo=k3s&logoColor=black)](https://k3s.io/)
+[![K3s](https://img.shields.io/badge/K3s-HA-FFC61C?logo=k3s&logoColor=black)](https://k3s.io/)
 [![Proxmox](https://img.shields.io/badge/Proxmox-VE%209-E57000?logo=proxmox&logoColor=white)](https://www.proxmox.com/)
+[![Flux](https://img.shields.io/badge/Flux-GitOps-5468FF?logo=flux&logoColor=white)](https://fluxcd.io/)
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Tunnel-F38020?logo=cloudflare&logoColor=white)](https://www.cloudflare.com/products/tunnel/)
-[![Apache](https://img.shields.io/badge/Apache-httpd-D22128?logo=apache&logoColor=white)](https://httpd.apache.org/)
+[![nginx](https://img.shields.io/badge/nginx-unprivileged-009639?logo=nginx&logoColor=white)](https://hub.docker.com/r/nginxinc/nginx-unprivileged)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 [**🔗 lootregen.com**](https://lootregen.com)
@@ -16,15 +17,11 @@
 
 ---
 
-A self-hosted personal website running on a home **K3s (Kubernetes)** cluster, exposed to the internet through a **Cloudflare Tunnel** — no open ports on the home router, no public IP exposed, valid TLS from Cloudflare's edge.
+My personal website, self-hosted on a home **K3s** cluster (three servers on three Proxmox laptops) and published through a **Cloudflare Tunnel** — no open ports on the home router, no public IP exposed, valid TLS from Cloudflare's edge.
 
-This repo contains everything needed to reproduce the deployment: Kubernetes manifests, helper scripts, and the static site itself.
+The site is baked into an **immutable nginx image**, and **Flux** deploys it from my GitOps repo [`homelab`](https://github.com/Lootregenit/homelab). A deploy is a commit that changes the image tag; a rollback is `git revert`.
 
-<!-- Optional: add a screenshot of the live site here
-<div align="center">
-  <img src="docs/screenshot.png" alt="lootregen.com screenshot" width="80%">
-</div>
--->
+This repo holds the site and everything needed to build it. The Kubernetes manifests live in the GitOps repo under `apps/lootregen`.
 
 ---
 
@@ -34,13 +31,13 @@ This repo contains everything needed to reproduce the deployment: Kubernetes man
 - [Architecture](#-architecture)
 - [Stack](#-stack)
 - [Repo layout](#-repo-layout)
-- [Prerequisites](#-prerequisites)
-- [Deployment](#-deployment)
+- [Deploying a change](#-deploying-a-change)
+- [Local preview](#-local-preview)
 - [Cloudflare Tunnel configuration](#-cloudflare-tunnel-configuration)
-- [Updating the site](#-updating-the-site)
 - [Debugging cheatsheet](#-debugging-cheatsheet)
-- [Resource limits](#-resource-limits)
+- [Hardening and resources](#-hardening-and-resources)
 - [Design notes](#-design-notes)
+- [History](#-history)
 - [What I'd do next](#-what-id-do-next)
 - [Teardown](#-teardown)
 - [License](#-license)
@@ -56,7 +53,7 @@ I originally ran the site as a simple `docker compose` stack on a single VM. It 
 - 🧹 Get rid of the *"works on my machine"* problem by declaring state as code
 - 💼 Build something I'd actually be comfortable putting on a **CV**
 
-So I migrated it to K3s running on Proxmox at home, kept Cloudflare Tunnel for ingress (no router port-forwarding, free TLS), and wrote this repo so the whole thing can be redeployed from scratch in minutes.
+So I moved it to K3s on Proxmox at home and kept Cloudflare Tunnel for ingress (no router port-forwarding, free TLS). In October 2026 I rebuilt the whole lab from code (Terraform, Ansible, Flux) and moved the site to real GitOps — see [History](#-history).
 
 ---
 
@@ -70,33 +67,44 @@ flowchart TB
     User -- "HTTPS · lootregen.com" --> CF
 
     subgraph HOME["🏠 Home network — no inbound ports open"]
-        subgraph K3S["K3s cluster · namespace: lootregen"]
-            CFD["🔌 cloudflared<br/>Deployment"]
-            SVC["ClusterIP Service<br/>apache:80"]
-            APACHE["🪶 Apache httpd<br/>Deployment"]
-            PVC[("💾 PVC<br/>local-path · 2Gi<br/>/htdocs")]
+        subgraph K3S["K3s HA cluster · 3 servers · namespace: lootregen"]
+            CFD["🔌 cloudflared<br/>2 replicas"]
+            SVC["ClusterIP Service<br/>lootregen-site:80"]
+            WEB["🌐 nginx-unprivileged<br/>2 replicas · read-only"]
 
             CFD -- "HTTP :80" --> SVC
-            SVC --> APACHE
-            APACHE -. mounts .-> PVC
+            SVC -- ":8080" --> WEB
         end
+        FLUX["🔁 Flux<br/>flux-system"]
+        FLUX -. "applies apps/lootregen" .-> K3S
     end
 
     CFD -. "outbound tunnel (QUIC)" .-> CF
+    GIT[("🐙 GitHub<br/>homelab repo")] -. "pulls" .-> FLUX
+    REG[("📦 ghcr.io<br/>lootregen-site")] -. "image" .-> WEB
 
     style CF fill:#f38020,color:#fff
     style CFD fill:#2b6cb0,color:#fff
-    style APACHE fill:#d22128,color:#fff
-    style PVC fill:#38a169,color:#fff
+    style WEB fill:#009639,color:#fff
+    style FLUX fill:#5468ff,color:#fff
 ```
 
 **How a request flows:**
 
 1. User hits `lootregen.com` → resolves to Cloudflare
 2. Cloudflare terminates TLS and forwards through the tunnel
-3. `cloudflared` pod receives the request inside the cluster
-4. Forwards via ClusterIP Service to the `apache` pod
-5. Apache serves static files from a PersistentVolume
+3. One of the two `cloudflared` pods receives the request inside the cluster
+4. It forwards via the ClusterIP Service to one of the two `lootregen-site` pods
+5. nginx serves the static files straight from the image
+
+**How a change gets live:**
+
+```text
+edit webpage/ -> git push
+  -> image ghcr.io/lootregenit/lootregen-site:<commit>  (Jenkins on K3s; by hand until it runs)
+  -> newTag: <commit> in homelab/apps/lootregen/kustomization.yaml
+  -> Flux applies it -> rolling update, the PodDisruptionBudget keeps one pod serving
+```
 
 > 🔒 **No inbound ports are open on the home network** — the tunnel is an *outbound* connection from `cloudflared` to Cloudflare's edge.
 
@@ -106,12 +114,14 @@ flowchart TB
 
 | Layer | Choice | Why |
 |---|---|---|
-| 🖥 Hypervisor | Proxmox VE 9 (ZFS root) | Free, mature, snapshots + replication ready |
-| ☸️ Orchestrator | K3s | CNCF-certified K8s, ~60 MB, runs great at home |
-| 🪶 Web server | Apache httpd | Simple, well-understood, serves static fine |
-| 🚪 Ingress | Cloudflare Tunnel | Free TLS, no port-forwarding, DDoS protection |
-| 💾 Storage | K3s `local-path` (on ZFS) | Built-in, fast, RWO is enough for single-node |
-| 🔑 Secrets | Kubernetes Secret | Token never touches Git or disk outside cluster |
+| 🖥 Hypervisor | Proxmox VE 9, 3 nodes | Free, mature, ZFS, backups to Proxmox Backup Server |
+| ☸️ Orchestrator | K3s HA: 3 servers, embedded etcd, kube-vip | Any one laptop can go down and the API stays up |
+| 🌐 Web server | nginx-unprivileged (Alpine) | Runs as uid 101 on port 8080, fits the restricted Pod Security level |
+| 🚪 Ingress | Cloudflare Tunnel, 2 × cloudflared | Free TLS, no port-forwarding, DDoS protection |
+| 🔁 Delivery | Flux | Git is the only way into the cluster; drift gets reverted |
+| 📦 Images | ghcr.io | One image per commit, tag = commit SHA |
+| 🔑 Secrets | SOPS + age | Tunnel token lives encrypted in Git; only the cluster can decrypt it |
+| ✅ CI | GitHub Actions | hadolint, build and smoke test on every push |
 
 ---
 
@@ -120,179 +130,164 @@ flowchart TB
 ```
 .
 ├── README.md
-├── lootregen.yaml          # All Kubernetes resources
-├── deploy.sh               # Idempotent deploy script
-├── setup-secret.sh         # Creates the Cloudflare token Secret
-├── upload-webpage.sh       # Copies webpage/ into the PVC
-├── .gitignore
-└── webpage/                # Static site files (HTML/CSS/JS/images)
-    └── index.html
+├── Dockerfile            # nginx-unprivileged with webpage/ baked in
+├── nginx.conf            # clean URLs, custom 404, caching, security headers
+├── .dockerignore
+├── Jenkinsfile           # build pod on K3s -> ghcr.io -> tag bump in homelab
+├── .github/workflows/
+│   └── dockerfile.yml    # hadolint + build + smoke test
+└── webpage/              # the site: index.html (EN/DE/PL via ?lang=), blog, posts, 404
 ```
-
-Everything in `lootregen.yaml` is namespace-scoped under `lootregen`, so nothing collides with other workloads on the cluster.
 
 ---
 
-## ✅ Prerequisites
+## 🚀 Deploying a change
 
-- A running K3s cluster (`kubectl get nodes` shows `Ready`)
-- `kubectl` configured on your workstation
-- A Cloudflare account with a Tunnel created (token in hand)
-- This repo cloned locally
+Once Jenkins runs, a push to `main` is all it takes. Until then, from my PC:
+
+```bash
+TAG=$(git rev-parse --short=12 HEAD)
+docker build -t ghcr.io/lootregenit/lootregen-site:$TAG .
+docker push ghcr.io/lootregenit/lootregen-site:$TAG
+```
+
+Then set `newTag: <TAG>` in `apps/lootregen/kustomization.yaml` in the `homelab` repo and push. Flux rolls it out within a few minutes.
+
+**Rollback:** `git revert` the deploy commit in `homelab`.
 
 ---
 
-## 🚀 Deployment
-
-Three steps:
+## 👀 Local preview
 
 ```bash
-# 1️⃣ Create the Cloudflare token Secret (hidden prompt)
-./setup-secret.sh
-
-# 2️⃣ Apply manifests and wait for rollout
-./deploy.sh
-
-# 3️⃣ Upload the webpage into the PVC
-./upload-webpage.sh
+docker build -t lootregen-site .
+docker run --rm -p 8080:8080 --read-only --tmpfs /tmp lootregen-site
 ```
 
-Verify:
-
-```bash
-kubectl get all -n lootregen
-```
-
-Both `apache` and `cloudflared` pods should be `Running`. ✔️
+Then open http://localhost:8080, http://localhost:8080/?lang=de or http://localhost:8080/?lang=pl.
 
 ---
 
 ## ☁️ Cloudflare Tunnel configuration
 
-In **Cloudflare Zero Trust → Tunnels → (your tunnel) → Public Hostnames**, point the service at the in-cluster DNS name:
+The tunnel is remotely managed. In **Cloudflare Zero Trust → Networks → Tunnels → (tunnel) → Public hostnames**, `lootregen.com` and `www.lootregen.com` point at the in-cluster DNS name:
 
 ```
-http://apache.lootregen.svc.cluster.local:80
+http://lootregen-site.lootregen.svc.cluster.local:80
 ```
 
-> 💡 Short form `http://apache:80` also works when cloudflared runs in the same namespace.
-
----
-
-## ✏️ Updating the site
-
-After editing files in `webpage/`:
-
-```bash
-./upload-webpage.sh
-```
-
-No pod restart needed — Apache serves the new files immediately. For a clean Apache restart:
-
-```bash
-kubectl rollout restart deployment/apache -n lootregen
-```
+The tunnel token is stored SOPS-encrypted in the `homelab` repo (`apps/lootregen/tunnel-token.sops.yaml`).
 
 ---
 
 ## 🩺 Debugging cheatsheet
 
 ```bash
-# Pod status
-kubectl get pods -n lootregen
+# What Flux thinks
+flux get kustomizations
+flux logs --kind=Kustomization --name=apps
 
-# Events + container state (image pull errors, OOM, probe failures...)
-kubectl describe pod <pod-name> -n lootregen
+# Pods (ideally one per node)
+kubectl -n lootregen get pods -o wide
+kubectl -n lootregen describe pod <pod-name>
 
 # Logs
-kubectl logs -n lootregen deployment/apache
-kubectl logs -n lootregen deployment/cloudflared
-
-# Shell into the Apache container
-kubectl exec -it -n lootregen deployment/apache -- bash
+kubectl -n lootregen logs deploy/lootregen-site
+kubectl -n lootregen logs deploy/cloudflared
 
 # Recent events newest-first
-kubectl get events -n lootregen --sort-by='.lastTimestamp'
+kubectl -n lootregen get events --sort-by='.lastTimestamp'
 ```
 
 ---
 
-## ⚖️ Resource limits
+## 🛡 Hardening and resources
 
-| Component | CPU request | CPU limit | Memory request | Memory limit |
-|---|---|---|---|---|
-| 🪶 apache | 1000m | 2000m | 512Mi | 6Gi |
-| 🔌 cloudflared | 250m | 1000m | 200Mi | 1Gi |
+The `lootregen` namespace enforces the **restricted** Pod Security Standard.
 
-Generous on Apache because memory is cheap at home and I'd rather not debug OOMKills at 23:00. 🌙
+| | lootregen-site | cloudflared |
+|---|---|---|
+| Replicas | 2, spread across nodes, PDB `minAvailable: 1` | 2, spread across nodes, PDB `minAvailable: 1` |
+| User | 101, non-root | 65532, non-root |
+| Root filesystem | read-only (emptyDir for `/tmp`) | read-only |
+| Privileges | all capabilities dropped, no escalation, seccomp `RuntimeDefault` | same |
+| CPU request | 10m | 10m |
+| Memory request / limit | 32Mi / 128Mi | 32Mi / 128Mi |
+
+The old Apache setup reserved a full CPU and up to 6 GiB "just in case". A static site needs a few MiB. 🌙
 
 ---
 
 ## 📝 Design notes
 
-A few decisions worth explaining:
-
 <details>
-<summary><b>💾 PVC instead of ConfigMap for the webpage</b></summary>
+<summary><b>📦 Site baked into the image instead of a PVC</b></summary>
 <br>
 
-ConfigMaps have a 1 MiB limit. The site is ~10 MiB. A PVC also means I can update content with `kubectl cp` without redeploying.
+The previous version copied the files into a PVC with `kubectl cp`. Fast, but the cluster drifted away from Git, and the files lived on one node's disk. Now every version is an image tag: any node can run it, two replicas need no shared storage, and a rollback is a `git revert`.
 </details>
 
 <details>
-<summary><b>📂 <code>local-path</code> storage class</b></summary>
+<summary><b>🔁 Flux instead of deploy scripts</b></summary>
 <br>
 
-Built into K3s, backed by a directory on the node's ZFS pool. Fast, zero-config. The trade-off is `ReadWriteOnce` — if I ever add a second K3s node and want Apache to migrate between nodes, I'll need NFS or Longhorn for `ReadWriteMany`.
+Nothing reaches the cluster except through Git. Changes made by hand are reverted at the next reconcile, so what's in the repo is what's running.
 </details>
 
 <details>
-<summary><b>🔑 Token in a Secret, never in Git</b></summary>
+<summary><b>🔑 Token encrypted in Git, not kept out of it</b></summary>
 <br>
 
-`setup-secret.sh` reads the token from a hidden prompt and pipes it into `kubectl apply`. The token never hits the filesystem or shell history.
+The tunnel token used to live only in the cluster, created by a script. Now it's in Git, encrypted with SOPS for the cluster's age key, so a rebuilt cluster gets it back on its own and nothing readable is ever committed.
 </details>
 
 <details>
-<summary><b>❤️‍🩹 <code>livenessProbe</code> and <code>readinessProbe</code> on Apache</b></summary>
+<summary><b>⚖️ Two replicas, spread across nodes, with a PodDisruptionBudget</b></summary>
 <br>
 
-If Apache becomes unresponsive, K8s restarts it automatically. If it's starting up, K8s won't send traffic to it. Free self-healing.
+One laptop can go down, or be drained for updates, and the site keeps serving. The same goes for `cloudflared`.
 </details>
 
 <details>
-<summary><b>🔗 No <code>depends_on</code> equivalent needed</b></summary>
+<summary><b>❤️‍🩹 Readiness and liveness probes</b></summary>
 <br>
 
-In Docker Compose, cloudflared declared `depends_on: apache`. In K8s, cloudflared will crash-loop until Apache is reachable, then succeed. The platform handles orchestration.
+nginx only gets traffic once it answers, and gets restarted if it stops answering. `cloudflared` is checked on its `/ready` endpoint.
 </details>
 
 <details>
 <summary><b>🔐 TLS terminated at Cloudflare</b></summary>
 <br>
 
-Traffic inside the cluster stays HTTP. Simpler, and there's no benefit to re-encrypting between cloudflared and Apache on the same node.
+Traffic inside the cluster stays HTTP. Simpler, and the hop from cloudflared to nginx never leaves the cluster network.
 </details>
+
+---
+
+## 📜 History
+
+| Version | How it ran |
+|---|---|
+| v1 | `docker compose` on a single VM |
+| v2 | K3s, Apache with a `local-path` PVC, files copied in with `kubectl cp`, deployed by scripts (see the git history) |
+| v3 · Oct 2026 | Lab rebuilt from code (Terraform, Ansible, Flux); site in an immutable nginx image, deployed by Flux |
 
 ---
 
 ## 🗺 What I'd do next
 
-- [ ] **Migrate to an Ingress controller + cert-manager** for on-prem TLS, so the site works even when accessed directly on the LAN
-- [ ] **Second K3s node + Longhorn** for real HA — Apache would survive a node reboot
-- [ ] **Argo CD or Flux** for true GitOps — push to main, cluster reconciles automatically
-- [ ] **Prometheus + Grafana + Loki** stack for observability (response times, error rates, resource usage)
-- [ ] **Helm chart** to parameterize image tags, replica counts, resource limits
+- [x] **Flux** for true GitOps — push to Git, the cluster reconciles automatically
+- [x] **More K3s nodes** for real HA — three servers now; the site survives a node going down
+- [ ] **Jenkins pipeline** — build on K3s, push to ghcr.io, bump the tag (the `Jenkinsfile` is ready)
+- [ ] **Prometheus + Grafana + Loki** for observability (response times, error rates, resource usage)
+- [ ] **Renovate** to keep image and chart versions current
+- [ ] **Ingress + cert-manager** for direct LAN access (cert-manager already runs in the cluster)
 
 ---
 
 ## 🧨 Teardown
 
-```bash
-kubectl delete namespace lootregen
-```
-
-Removes everything including the PVC and its contents. ⚠️
+Remove `- lootregen` from `apps/kustomization.yaml` in the `homelab` repo and push. Flux prunes the namespace and everything in it. Nothing is lost: the site lives in the image.
 
 ---
 

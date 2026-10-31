@@ -1,0 +1,45 @@
+---
+name: dockerfile
+
+# Quick check on GitHub that the image builds and serves the site.
+# Real builds and deploys run on Jenkins (jenkins-01 -> K3s build pods).
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+
+      - name: build
+        run: docker build -t site:ci .
+
+      - name: smoke test
+        run: |
+          # Same restrictions as in the cluster: uid 101, read-only root filesystem
+          docker run -d --name site -p 8080:8080 --read-only --tmpfs /tmp --user 101 site:ci
+          for i in $(seq 1 20); do curl -fs http://localhost:8080/ >/dev/null && break; sleep 1; done
+          check() {
+            code=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:8080$1")
+            echo "$1 -> $code (want $2)"
+            [ "$code" = "$2" ]
+          }
+          fail=0
+          for p in / '/?lang=de' '/?lang=pl' /blog /posts/homelab-part-1 /favicon.png; do
+            check "$p" 200 || fail=1
+          done
+          check /does-not-exist 404 || fail=1
+          curl -s http://localhost:8080/does-not-exist | grep -qi '<html' || { echo "custom 404 page missing"; fail=1; }
+          docker logs site | tail -n 20
+          exit "$fail"
