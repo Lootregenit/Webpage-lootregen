@@ -3,3 +3,5 @@
 Jenkinsfile
 README*.md
 *.log
+webpage/.thumbnail
+**/.DS_Store

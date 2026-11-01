@@ -36,10 +36,12 @@ jobs:
             [ "$code" = "$2" ]
           }
           fail=0
-          for p in / '/?lang=de' '/?lang=pl' /blog /posts/homelab-part-1 /favicon.png; do
+          for p in / '/?lang=de' '/?lang=pl' /homelab /cv /blog /posts/homelab-part-1 \
+                   /favicon.png /robots.txt /sitemap.xml /docs/basislehrjahr-zertifikat.pdf; do
             check "$p" 200 || fail=1
           done
           check /does-not-exist 404 || fail=1
+          check /.thumbnail 404 || fail=1   # design export leftovers never ship
           curl -s http://localhost:8080/does-not-exist | grep -qi '<html' || { echo "custom 404 page missing"; fail=1; }
           docker logs site | tail -n 20
           exit "$fail"

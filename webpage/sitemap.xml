@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://lootregen.com/</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lootregen.com/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://lootregen.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://lootregen.com/?lang=pl"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lootregen.com/"/>
+  </url>
+  <url>
+    <loc>https://lootregen.com/homelab.html</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://lootregen.com/cv.html</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://lootregen.com/blog.html</loc>
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lootregen.com/posts/homelab-part-1.html</loc>
+    <lastmod>2026-06-10</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://lootregen.com/posts/homelab-part-2.html</loc>
+    <lastmod>2026-11-01</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://lootregen.com/posts/n100-nas.html</loc>
+    <lastmod>2026-07-01</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://lootregen.com/posts/fedora-thinkpad.html</loc>
+    <lastmod>2026-07-04</lastmod>
+    <priority>0.6</priority>
+  </url>
+</urlset>

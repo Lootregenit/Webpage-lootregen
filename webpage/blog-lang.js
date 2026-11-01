@@ -11,6 +11,9 @@
 // Apply saved language immediately (before first paint)
 (function(){
   var saved = localStorage.getItem('lang') || 'en';
+  // ?lang=de|pl in the URL wins (sitemap hreflang links, links from the old site)
+  var q = /[?&]lang=(en|de|pl)\b/.exec(location.search);
+  if (q) { saved = q[1]; localStorage.setItem('lang', saved); }
   if (['en','de','pl'].indexOf(saved) === -1) saved = 'en';
   document.documentElement.setAttribute('data-lang', saved);
   document.documentElement.lang = saved;
@@ -34,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 // Theme (shares the main site's 'theme' setting)
 (function(){
-  var t = localStorage.getItem('theme') || 'dark';
+  var t = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', t);
 })();
 function toggleBlogTheme(){

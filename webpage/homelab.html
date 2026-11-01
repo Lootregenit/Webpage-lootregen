@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homelab · Mateusz Woźniak</title>
+<meta name="description" content="Three-node Proxmox VE 9 cluster with HA K3s and Flux GitOps, rebuilt from code with Terraform and Ansible. Self-hosted in Switzerland.">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="blog.css">
+<script src="blog-lang.js"></script>
+<script src="blog-legal.js" defer></script>
+<script src="stickman.js" defer></script>
+<link rel="canonical" href="https://lootregen.com/homelab.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Homelab · Mateusz Woźniak">
+<meta property="og:description" content="Three-node Proxmox VE 9 cluster with HA K3s and Flux GitOps, rebuilt from code with Terraform and Ansible. Self-hosted in Switzerland.">
+<meta property="og:url" content="https://lootregen.com/homelab.html">
+<meta property="og:image" content="https://lootregen.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<nav>
+<a class="nav-logo" href="index.html">Mateusz Woźniak</a>
+<div class="nav-menu">
+<a href="index.html"><span class="lang-en">About</span><span class="lang-de">Über mich</span><span class="lang-pl">O mnie</span></a>
+<a href="cv.html"><span class="lang-en">CV</span><span class="lang-de">Lebenslauf</span><span class="lang-pl">CV</span></a>
+<a href="homelab.html" class="current">Homelab</a>
+<a href="blog.html">Blog</a>
+</div>
+<div class="nav-r">
+<div class="lang-btns"><button class="lbtn active" data-lang="en" onclick="setLang('en')">EN</button><button class="lbtn" data-lang="de" onclick="setLang('de')">DE</button><button class="lbtn" data-lang="pl" onclick="setLang('pl')">PL</button></div>
+<button class="tbtn" id="tbtn" onclick="toggleBlogTheme()" title="Light / dark" aria-label="Toggle light / dark theme">☀</button>
+</div>
+</nav>
+<main class="wrap">
+<section class="sm-layout sm-left" data-screen-label="Homelab intro">
+<stick-man pose="lab"><span class="lang-en">rebuilding…</span><span class="lang-de">im Umbau…</span><span class="lang-pl">w przebudowie…</span></stick-man>
+<div>
+<h1 class="page-title">Homelab</h1>
+<p class="lead"><span class="lang-en">I learn best by running things myself and fixing them afterwards. Right now I'm rebuilding my homelab from scratch, this time entirely from code: a three-node Proxmox cluster on three laptops, a highly available K3s cluster on top, and Git as the only way to change anything. This website already runs on it.</span><span class="lang-de">Am besten lerne ich, wenn ich Dinge selbst betreibe und sie danach wieder flicke. Gerade baue ich mein Homelab neu auf, diesmal komplett aus Code: ein Proxmox-Cluster mit drei Nodes auf drei Laptops, darauf ein hochverfügbarer K3s-Cluster, und Änderungen gibt es nur über Git. Diese Website läuft schon darauf.</span><span class="lang-pl">Najlepiej uczę się, gdy sam coś utrzymuję, a potem to naprawiam. Teraz buduję homelab od nowa, tym razem w całości z kodu: trzywęzłowy klaster Proxmox na trzech laptopach, na nim wysoko dostępny klaster K3s, a zmiany wprowadzam wyłącznie przez Git. Ta strona już na nim działa.</span></p>
+</div>
+</section>
+<section class="block narrow" data-screen-label="Progress">
+<h2><span class="lang-en">Progress</span><span class="lang-de">Fortschritt</span><span class="lang-pl">Postęp</span></h2>
+<p class="note"><span class="lang-en">updated Nov 2026</span><span class="lang-de">Stand: Nov. 2026</span><span class="lang-pl">stan: lis. 2026</span></p>
+<p><span class="lang-en">About 60% of the rebuild is done, and about 30% of the whole roadmap.</span><span class="lang-de">Rund 60 % des Neuaufbaus sind fertig, von der ganzen Roadmap etwa 30 %.</span><span class="lang-pl">Około 60% przebudowy jest gotowe, a z całej roadmapy mniej więcej 30%.</span></p>
+<table class="phases"><thead><tr><th><span class="lang-en">Phase</span><span class="lang-de">Phase</span><span class="lang-pl">Etap</span></th><th><span class="lang-en">What</span><span class="lang-de">Was</span><span class="lang-pl">Co</span></th><th>Status</th></tr></thead><tbody>
+<tr><td>0–3</td><td>Proxmox ×3, Ansible, <span class="lang-en">cluster</span><span class="lang-de">Cluster</span><span class="lang-pl">klaster</span>, Terraform</td><td class="st done"><span class="lang-en">Done</span><span class="lang-de">Fertig</span><span class="lang-pl">Gotowe</span></td></tr>
+<tr><td>4</td><td><span class="lang-en">Backups (PBS) + restore drill</span><span class="lang-de">Backups (PBS) + Restore-Test</span><span class="lang-pl">Backupy (PBS) + test odtwarzania</span></td><td class="st done"><span class="lang-en">Done</span><span class="lang-de">Fertig</span><span class="lang-pl">Gotowe</span></td></tr>
+<tr><td>5</td><td>K3s HA</td><td class="st done"><span class="lang-en">Done, power-off test still open</span><span class="lang-de">Fertig, Ausschalt-Test noch offen</span><span class="lang-pl">Gotowe, test z odcięciem zasilania jeszcze przede mną</span></td></tr>
+<tr><td>6</td><td>Flux GitOps</td><td class="st done"><span class="lang-en">Done</span><span class="lang-de">Fertig</span><span class="lang-pl">Gotowe</span></td></tr>
+<tr><td>7</td><td><span class="lang-en">lootregen.com on K3s</span><span class="lang-de">lootregen.com auf K3s</span><span class="lang-pl">lootregen.com na K3s</span></td><td class="st done"><span class="lang-en">Done</span><span class="lang-de">Fertig</span><span class="lang-pl">Gotowe</span></td></tr>
+<tr><td>8</td><td>dc-01 (Active Directory + DNS)</td><td class="st next"><span class="lang-en">Next</span><span class="lang-de">Als Nächstes</span><span class="lang-pl">Następny</span></td></tr>
+<tr><td>9</td><td><span class="lang-en">Jenkins (site builds)</span><span class="lang-de">Jenkins (Website-Builds)</span><span class="lang-pl">Jenkins (buildy strony)</span></td><td class="st todo"><span class="lang-en">Planned</span><span class="lang-de">Geplant</span><span class="lang-pl">W planach</span></td></tr>
+<tr><td>10</td><td><span class="lang-en">Azure DevOps (Terraform + Ansible from K3s)</span><span class="lang-de">Azure DevOps (Terraform + Ansible aus K3s)</span><span class="lang-pl">Azure DevOps (Terraform + Ansible z K3s)</span></td><td class="st todo"><span class="lang-en">Planned</span><span class="lang-de">Geplant</span><span class="lang-pl">W planach</span></td></tr>
+<tr><td>11+</td><td><span class="lang-en">Monitoring, Velero DR, Renovate, apps</span><span class="lang-de">Monitoring, Velero-DR, Renovate, Apps</span><span class="lang-pl">Monitoring, Velero DR, Renovate, aplikacje</span></td><td class="st todo"><span class="lang-en">Planned</span><span class="lang-de">Geplant</span><span class="lang-pl">W planach</span></td></tr>
+</tbody></table>
+</section>
+<section class="block narrow" data-screen-label="How it's built">
+<h2><span class="lang-en">How it's built</span><span class="lang-de">Wie es aufgebaut ist</span><span class="lang-pl">Jak to jest zbudowane</span></h2>
+<div class="flow" aria-label="Git → Terraform and Ansible → Proxmox → K3s → Flux → lootregen.com"><b>Git</b><i>→</i><b>Terraform · Ansible</b><i>→</i><b>Proxmox</b><i>→</i><b>K3s</b><i>→</i><b>Flux</b><i>→</i><b>lootregen.com</b></div>
+<p><span class="lang-en">Nothing gets clicked together by hand. All tools run from one toolbox container on my PC, with pinned versions of Terraform, Ansible, kubectl, Flux and SOPS, so the same command gives the same result every time.</span><span class="lang-de">Nichts wird von Hand zusammengeklickt. Alle Tools laufen aus einem Toolbox-Container auf meinem PC, mit festen Versionen von Terraform, Ansible, kubectl, Flux und SOPS. So liefert derselbe Befehl jedes Mal dasselbe Ergebnis.</span><span class="lang-pl">Nic nie jest wyklikane ręcznie. Wszystkie narzędzia działają z jednego kontenera toolbox na moim PC, z przypiętymi wersjami Terraform, Ansible, kubectl, Flux i SOPS, więc ta sama komenda za każdym razem daje ten sam wynik.</span></p>
+<table><thead><tr><th>Repo</th><th><span class="lang-en">What it does</span><span class="lang-de">Was es macht</span><span class="lang-pl">Co robi</span></th></tr></thead><tbody>
+<tr><td class="mono">homelab-ansible</td><td><span class="lang-en">Configures the Proxmox hosts, the cluster, PBS, Ubuntu Pro and K3s. Secrets are in Ansible Vault. Every playbook passes a second run with <code>changed=0</code>.</span><span class="lang-de">Konfiguriert die Proxmox-Hosts, den Cluster, PBS, Ubuntu Pro und K3s. Secrets liegen in Ansible Vault. Jedes Playbook läuft ein zweites Mal mit <code>changed=0</code> durch.</span><span class="lang-pl">Konfiguruje hosty Proxmox, klaster, PBS, Ubuntu Pro i K3s. Sekrety są w Ansible Vault. Każdy playbook przechodzi drugie uruchomienie z <code>changed=0</code>.</span></td></tr>
+<tr><td class="mono">homelab-terraform</td><td><span class="lang-en">Every VM, defined in one table. The VMID is the last part of the IP. State lives in HCP Terraform; VMs boot from cloud images with cloud-init.</span><span class="lang-de">Jede VM, definiert in einer Tabelle. Die VMID ist der letzte Teil der IP. Der State liegt in HCP Terraform; VMs starten aus Cloud-Images mit cloud-init.</span><span class="lang-pl">Każda VM zdefiniowana w jednej tabeli. VMID to ostatnia część adresu IP. State jest w HCP Terraform; VM-ki startują z obrazów chmurowych z cloud-init.</span></td></tr>
+<tr><td class="mono">homelab</td><td><span class="lang-en">Flux: cert-manager, MetalLB, NFS storage, then the apps. Secrets are encrypted with SOPS + age.</span><span class="lang-de">Flux: cert-manager, MetalLB, NFS-Speicher, danach die Apps. Secrets sind mit SOPS + age verschlüsselt.</span><span class="lang-pl">Flux: cert-manager, MetalLB, pamięć NFS, potem aplikacje. Sekrety są szyfrowane SOPS + age.</span></td></tr>
+<tr><td class="mono">Webpage-lootregen</td><td><span class="lang-en">This website, baked into an nginx image and checked by GitHub Actions on every push.</span><span class="lang-de">Diese Website, gebacken in ein nginx-Image und bei jedem Push von GitHub Actions geprüft.</span><span class="lang-pl">Ta strona, zapakowana w obraz nginx i sprawdzana przez GitHub Actions przy każdym pushu.</span></td></tr>
+</tbody></table>
+<p class="sub"><a href="https://github.com/Lootregenit" target="_blank" rel="noopener">GitHub</a> · <span class="lang-en">the homelab repos are private for now</span><span class="lang-de">die Homelab-Repos sind vorerst privat</span><span class="lang-pl">repozytoria homelabu są na razie prywatne</span></p>
+</section>
+<section class="block narrow" data-screen-label="Hardware">
+<h2><span class="lang-en">Hardware</span><span class="lang-de">Hardware</span><span class="lang-pl">Sprzęt</span></h2>
+<p class="note"><span class="lang-en">yes, laptops. it works.</span><span class="lang-de">ja, Laptops. läuft.</span><span class="lang-pl">tak, laptopy. działa.</span></p>
+<p><span class="lang-en">Three laptops instead of servers. They're quiet, use little power, and the batteries act as a UPS, watched by NUT. All three are Proxmox VE 9 nodes and all three vote, so the cluster has a real quorum and the Raspberry Pi tiebreaker from the first version is gone.</span><span class="lang-de">Drei Laptops statt Server. Leise, sparsam, und die Akkus dienen als USV, überwacht von NUT. Alle drei sind Proxmox-VE-9-Nodes und alle drei stimmen ab. Damit hat der Cluster ein echtes Quorum, und der Raspberry Pi aus der ersten Version ist weg.</span><span class="lang-pl">Trzy laptopy zamiast serwerów. Są ciche, biorą mało prądu, a baterie działają jak UPS, pilnowany przez NUT. Wszystkie trzy to węzły Proxmox VE 9 i wszystkie trzy głosują, więc klaster ma prawdziwe kworum, a Raspberry Pi z pierwszej wersji nie jest już potrzebne.</span></p>
+<p><span class="lang-en">The LAN is plain 1 GbE. pve-01 and pve-02 also have a direct Thunderbolt cable for live migrations; I measured 14.8 Gbit/s on it. On every host the ZFS cache is capped, Tailscale is installed, and the Proxmox UI has a Let's Encrypt certificate issued through Cloudflare.</span><span class="lang-de">Das LAN ist einfaches 1 GbE. pve-01 und pve-02 haben zusätzlich ein direktes Thunderbolt-Kabel für Live-Migrationen; gemessen habe ich darauf 14,8 Gbit/s. Auf jedem Host ist der ZFS-Cache begrenzt, Tailscale installiert, und die Proxmox-Oberfläche hat ein Let's-Encrypt-Zertifikat über Cloudflare.</span><span class="lang-pl">LAN to zwykły 1 GbE. pve-01 i pve-02 mają dodatkowo bezpośredni kabel Thunderbolt do migracji na żywo; zmierzyłem na nim 14,8 Gbit/s. Na każdym hoście cache ZFS jest ograniczony, działa Tailscale, a panel Proxmoxa ma certyfikat Let's Encrypt wystawiony przez Cloudflare.</span></p>
+<table><thead><tr><th>Host</th><th><span class="lang-en">Hardware</span><span class="lang-de">Hardware</span><span class="lang-pl">Sprzęt</span></th><th><span class="lang-en">Runs</span><span class="lang-de">Darauf</span><span class="lang-pl">Działa na nim</span></th></tr></thead><tbody>
+<tr><td>pve-01</td><td>Dell Precision 3561 · i7 · 32 GB</td><td>k8s-01</td></tr>
+<tr><td>pve-02</td><td>Dell Precision 3561 · i7 · 32 GB</td><td>k8s-02</td></tr>
+<tr><td>pve-03</td><td>Dell Latitude 5420 · i5 · 32 GB</td><td>k8s-03</td></tr>
+<tr><td>nas-01</td><td>OpenMediaVault · Intel N100 · 2 × 4 TB RAID 1</td><td><span class="lang-en">Backups, etcd snapshots, cluster volumes</span><span class="lang-de">Backups, etcd-Snapshots, Cluster-Volumes</span><span class="lang-pl">Backupy, snapshoty etcd, wolumeny klastra</span></td></tr>
+</tbody></table>
+</section>
+<section class="block narrow" data-screen-label="VMs and Kubernetes">
+<h2><span class="lang-en">VMs and Kubernetes</span><span class="lang-de">VMs und Kubernetes</span><span class="lang-pl">VM-ki i Kubernetes</span></h2>
+<div class="row"><div class="when mono">pbs-01</div><div><span class="lang-en">Proxmox Backup Server, with its data on the NAS. A nightly backup runs at 02:30 and keeps 7 daily, 4 weekly and 3 monthly copies.</span><span class="lang-de">Proxmox Backup Server, die Daten liegen auf dem NAS. Jede Nacht um 02:30 läuft ein Backup; behalten werden 7 tägliche, 4 wöchentliche und 3 monatliche Kopien.</span><span class="lang-pl">Proxmox Backup Server z danymi na NAS-ie. Backup rusza co noc o 02:30 i trzyma 7 kopii dziennych, 4 tygodniowe i 3 miesięczne.</span></div></div>
+<div class="row"><div class="when mono">k8s-01/02/03</div><div><span class="lang-en">Ubuntu 26.04 with Ubuntu Pro, one VM per laptop.</span><span class="lang-de">Ubuntu 26.04 mit Ubuntu Pro, eine VM pro Laptop.</span><span class="lang-pl">Ubuntu 26.04 z Ubuntu Pro, jedna VM na laptop.</span></div></div>
+<div class="row"><div class="when mono">K3s 1.36</div><div><span class="lang-en">Three servers with embedded etcd. The API is reached through a virtual IP from kube-vip. etcd snapshots go to the NAS every 6 hours.</span><span class="lang-de">Drei Server mit eingebautem etcd. Die API ist über eine virtuelle IP von kube-vip erreichbar. etcd-Snapshots gehen alle 6 Stunden auf das NAS.</span><span class="lang-pl">Trzy serwery z wbudowanym etcd. API jest dostępne przez wirtualny adres IP z kube-vip. Snapshoty etcd trafiają na NAS co 6 godzin.</span></div></div>
+</section>
+<section class="block narrow" data-screen-label="How this site reaches you">
+<h2><span class="lang-en">How this site gets to you</span><span class="lang-de">Wie diese Seite zu dir kommt</span><span class="lang-pl">Jak ta strona do ciebie trafia</span></h2>
+<div class="flow" aria-label="Cloudflare → Tunnel → 2 cloudflared pods → 2 nginx pods"><b>Cloudflare</b><i>→</i><b>Tunnel</b><i>→</i><b>2 × cloudflared</b><i>→</i><b>2 × nginx</b></div>
+<p><span class="lang-en">There are no open ports on my router. Requests come in through a Cloudflare Tunnel to two cloudflared pods, then to two nginx pods on different nodes. The nginx pods are locked down: they run as non-root with a read-only filesystem. www redirects to lootregen.com.</span><span class="lang-de">Mein Router hat keine offenen Ports. Anfragen kommen über einen Cloudflare Tunnel zu zwei cloudflared-Pods und dann zu zwei nginx-Pods auf verschiedenen Nodes. Die nginx-Pods sind abgesichert: Sie laufen ohne Root und mit schreibgeschütztem Dateisystem. www leitet auf lootregen.com um.</span><span class="lang-pl">Mój router nie ma otwartych portów. Ruch wchodzi przez Cloudflare Tunnel do dwóch podów cloudflared, a potem do dwóch podów nginx na różnych węzłach. Pody nginx są zabezpieczone: działają bez roota i z systemem plików tylko do odczytu. www przekierowuje na lootregen.com.</span></p>
+<p><span class="lang-en">A deploy is a Git commit that changes the image tag. A rollback is <code>git revert</code>.</span><span class="lang-de">Ein Deploy ist ein Git-Commit, der den Image-Tag ändert. Ein Rollback ist <code>git revert</code>.</span><span class="lang-pl">Wdrożenie to commit w Gicie, który zmienia tag obrazu. Rollback to <code>git revert</code>.</span></p>
+</section>
+<section class="block narrow" data-screen-label="Tested">
+<h2><span class="lang-en">What's tested</span><span class="lang-de">Was getestet ist</span><span class="lang-pl">Co jest przetestowane</span></h2>
+<ul class="plain">
+<li><span class="lang-en">Ansible is idempotent: a second run of every playbook reports <code>changed=0</code></span><span class="lang-de">Ansible ist idempotent: Ein zweiter Lauf jedes Playbooks meldet <code>changed=0</code></span><span class="lang-pl">Ansible jest idempotentny: drugie uruchomienie każdego playbooka zwraca <code>changed=0</code></span></li>
+<li><span class="lang-en">A backup was restored from PBS and booted</span><span class="lang-de">Ein Backup wurde aus PBS wiederhergestellt und gebootet</span><span class="lang-pl">Backup został odtworzony z PBS i uruchomiony</span></li>
+<li><span class="lang-en">MetalLB and NFS storage passed a smoke test</span><span class="lang-de">MetalLB und NFS-Speicher haben einen Smoke-Test bestanden</span><span class="lang-pl">MetalLB i pamięć NFS przeszły smoke test</span></li>
+<li><span class="lang-en">The site answers 200 where it should, and 404 where it should</span><span class="lang-de">Die Seite antwortet mit 200, wo sie soll, und mit 404, wo sie soll</span><span class="lang-pl">Strona odpowiada 200 tam, gdzie powinna, i 404 tam, gdzie powinna</span></li>
+<li><span class="lang-en"><strong>Still open:</strong> switching a node off to prove K3s HA</span><span class="lang-de"><strong>Noch offen:</strong> einen Node ausschalten, um K3s-HA zu beweisen</span><span class="lang-pl"><strong>Jeszcze przede mną:</strong> wyłączenie węzła, żeby udowodnić HA K3s</span></li>
+</ul>
+</section>
+<section class="block narrow" data-screen-label="History">
+<h2><span class="lang-en">History</span><span class="lang-de">Verlauf</span><span class="lang-pl">Historia</span></h2>
+<div class="row"><div class="when"><span class="lang-en">Now</span><span class="lang-de">Jetzt</span><span class="lang-pl">Teraz</span></div><div><span class="lang-en">Three-node rebuild, everything from code</span><span class="lang-de">Neuaufbau mit drei Nodes, alles aus Code</span><span class="lang-pl">Przebudowa na trzy węzły, wszystko z kodu</span></div></div>
+<div class="row"><div class="when"><span class="lang-en">Summer 2026</span><span class="lang-de">Sommer 2026</span><span class="lang-pl">Lato 2026</span></div><div><span class="lang-en">Two Precision nodes plus a Raspberry Pi QDevice, set up by hand (blog parts 1 and 2)</span><span class="lang-de">Zwei Precision-Nodes plus ein Raspberry Pi als QDevice, von Hand eingerichtet (Blog Teil 1 und 2)</span><span class="lang-pl">Dwa węzły Precision plus Raspberry Pi jako QDevice, skonfigurowane ręcznie (blog, część 1 i 2)</span></div></div>
+<div class="row"><div class="when">2024 – 2026</div><div><span class="lang-en">Single Microsoft Hyper-V host, Intel Core i5-8400, 32 GB RAM</span><span class="lang-de">Einzelner Microsoft-Hyper-V-Host, Intel Core i5-8400, 32 GB RAM</span><span class="lang-pl">Pojedynczy host Microsoft Hyper-V, Intel Core i5-8400, 32 GB RAM</span></div></div>
+</section>
+<section class="block narrow" data-screen-label="Posts">
+<h2><span class="lang-en">Written up on the blog</span><span class="lang-de">Im Blog beschrieben</span><span class="lang-pl">Opisane na blogu</span></h2>
+<a class="post" href="posts/homelab-part-1.html"><div class="post-meta"><span>10 June 2026</span></div><div class="post-title"><span class="lang-en">Part 1: Base setup, installing Proxmox, and getting backups running</span><span class="lang-de">Teil 1: Grundsetup, Proxmox-Installation und laufende Backups</span><span class="lang-pl">Część 1: Konfiguracja bazowa, instalacja Proxmoxa i działające backupy</span></div></a>
+<a class="post" href="posts/homelab-part-2.html"><div class="post-meta"><span>24 June 2026</span></div><div class="post-title"><span class="lang-en">Part 2: The Raspberry Pi tiebreaker and a Thunderbolt link</span><span class="lang-de">Teil 2: Der Raspberry Pi als Zünglein an der Waage und ein Thunderbolt-Link</span><span class="lang-pl">Część 2: Raspberry Pi jako rozjemca i łącze Thunderbolt</span></div></a>
+<a class="post" href="posts/n100-nas.html"><div class="post-meta"><span>1 July 2026</span></div><div class="post-title"><span class="lang-en">Building a silent, low-power NAS on an Intel N100</span><span class="lang-de">Ein leiser, sparsamer Eigenbau-NAS auf Intel N100</span><span class="lang-pl">Cichy, energooszczędny NAS na Intelu N100</span></div></a>
+</section>
+</main>
+<footer>
+<p>© 2026 Mateusz Woźniak · <span class="lang-en">Made in Switzerland</span><span class="lang-de">Gemacht in der Schweiz</span><span class="lang-pl">Zrobione w Szwajcarii</span></p>
+<div class="footer-links"><a onclick="openLegal('privacy')"><span class="lang-en">Privacy Policy</span><span class="lang-de">Datenschutz</span><span class="lang-pl">Polityka prywatności</span></a><a onclick="openLegal('impressum')">Impressum</a></div>
+</footer>
+</body>
+</html>

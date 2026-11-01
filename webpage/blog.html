@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   ═══════════════════════════════════════════════════════════════
-  LOOTREGEN BLOG — POST LISTING
+  LOOTREGEN BLOG - POST LISTING
   All blog posts, newest first. Shares language + theme
   settings with the main page via localStorage.
 
@@ -14,83 +14,79 @@
   Updated  : July 2026
   ═══════════════════════════════════════════════════════════════
 -->
-<html lang="en" data-lang="en">
+<html lang="en" data-lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blog · Lootregen</title>
-<meta name="description" content="Transmission log — notes on Proxmox, Kubernetes, Docker and homelab infrastructure by Lootregen.">
+<title>Blog · Mateusz Woźniak</title>
+<meta name="description" content="Notes on Proxmox, Kubernetes, Docker and homelab infrastructure by Mateusz Woźniak.">
 <meta name="robots" content="index, follow">
-<link rel="stylesheet" href="fonts-inlined.css">
 <link rel="stylesheet" href="blog.css">
 <script src="blog-lang.js"></script>
 <script src="blog-legal.js" defer></script>
+<script src="stickman.js" defer></script>
+<link rel="canonical" href="https://lootregen.com/blog.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Blog · Mateusz Woźniak">
+<meta property="og:description" content="Notes on Proxmox, Kubernetes, Docker and homelab infrastructure by Mateusz Woźniak.">
+<meta property="og:url" content="https://lootregen.com/blog.html">
+<meta property="og:image" content="https://lootregen.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
 
 <nav>
-  <a class="nav-logo" href="index.html">Loot<span>regen</span></a>
-  <div class="nav-menu">
-    <a href="index.html#implants"><span class="lang-en">Tech Stack</span><span class="lang-de">Tech-Stack</span><span class="lang-pl">Tech Stack</span></a>
-    <a href="index.html#contracts"><span class="lang-en">Certifications</span><span class="lang-de">Zertifikate</span><span class="lang-pl">Certyfikaty</span></a>
-    <a href="index.html#skilltree"><span class="lang-en">Skill Tree</span><span class="lang-de">Skilltree</span><span class="lang-pl">Drzewo Umiejętności</span></a>
-    <a href="index.html#homelab">Homelab</a>
-    <a href="index.html#projects"><span class="lang-en">Projects</span><span class="lang-de">Projekte</span><span class="lang-pl">Projekty</span></a>
-    <a class="current" href="blog.html">Blog</a>
-    <a href="index.html#contact"><span class="lang-en">Contact</span><span class="lang-de">Kontakt</span><span class="lang-pl">Kontakt</span></a>
-  </div>
-  <div class="nav-r">
-    <div class="lang-btns">
-      <button class="lbtn active" data-lang="en" onclick="setLang('en')">EN</button>
-      <button class="lbtn" data-lang="de" onclick="setLang('de')">DE</button>
-      <button class="lbtn" data-lang="pl" onclick="setLang('pl')">PL</button>
-    </div>
-    <button class="tbtn" id="tbtn" onclick="toggleBlogTheme()" title="Toggle theme" aria-label="Toggle light / dark theme">☀</button>
-    <a class="nav-back" href="index.html"><span class="lang-en">← BACK TO MAIN</span><span class="lang-de">← ZUR HAUPTSEITE</span><span class="lang-pl">← STRONA GŁÓWNA</span></a>
-  </div>
+<a class="nav-logo" href="index.html">Mateusz Woźniak</a>
+<div class="nav-menu">
+<a href="index.html"><span class="lang-en">About</span><span class="lang-de">Über mich</span><span class="lang-pl">O mnie</span></a>
+<a href="cv.html"><span class="lang-en">CV</span><span class="lang-de">Lebenslauf</span><span class="lang-pl">CV</span></a>
+<a href="homelab.html">Homelab</a>
+<a href="blog.html" class="current">Blog</a>
+</div>
+<div class="nav-r">
+<div class="lang-btns"><button class="lbtn active" data-lang="en" onclick="setLang('en')">EN</button><button class="lbtn" data-lang="de" onclick="setLang('de')">DE</button><button class="lbtn" data-lang="pl" onclick="setLang('pl')">PL</button></div>
+<button class="tbtn" id="tbtn" onclick="toggleBlogTheme()" title="Light / dark" aria-label="Toggle light / dark theme">☀</button>
+</div>
 </nav>
 
 <main class="wrap">
   <div class="blog-label"><span class="lang-en">// Transmission Log</span><span class="lang-de">// Übertragungsprotokoll</span><span class="lang-pl">// Dziennik Transmisji</span></div>
+<div class="sm-layout sm-left blog-head">
+<stick-man pose="desk"></stick-man>
+<div>
   <h1 class="page-title">Blog</h1>
-  <p class="blog-sub">
-    <span class="lang-en">Notes from the homelab — Proxmox, Kubernetes, Docker, certs and whatever breaks at 2 AM. Written by a human, hosted on his own hardware.</span>
-    <span class="lang-de">Notizen aus dem Homelab — Proxmox, Kubernetes, Docker, Zertifikate und alles, was um 2 Uhr nachts kaputtgeht. Von einem Menschen geschrieben, auf eigener Hardware gehostet.</span>
-    <span class="lang-pl">Notatki z homelabu — Proxmox, Kubernetes, Docker, certyfikaty i wszystko, co psuje się o 2 w nocy. Pisane przez człowieka, hostowane na własnym sprzęcie.</span>
-  </p>
+  <p class="blog-sub"><span class="lang-en">Notes from my homelab: Proxmox, Kubernetes, Docker, certifications and whatever broke this week. I write down what I did, mistakes included, so I don't make them twice.</span><span class="lang-de">Notizen aus meinem Homelab: Proxmox, Kubernetes, Docker, Zertifikate und was diese Woche kaputtgegangen ist. Ich schreibe auf, was ich gemacht habe, Fehler inklusive, damit ich sie nicht zweimal mache.</span><span class="lang-pl">Notatki z mojego homelabu: Proxmox, Kubernetes, Docker, certyfikaty i to, co zepsuło się w tym tygodniu. Zapisuję, co zrobiłem, razem z błędami, żeby nie popełnić ich dwa razy.</span></p>
+</div>
+</div>
 
   <a class="post" href="posts/fedora-thinkpad.html">
     <div class="post-meta"><span>2026-07-04</span><span class="tag">#linux #fedora</span><span><span class="lang-en">5 min read</span><span class="lang-de">5 Min. Lesezeit</span><span class="lang-pl">5 min czytania</span></span></div>
     <div class="post-title"><span class="lang-en">My Daily Driver: A ThinkPad T14 Gen 1 AMD Running Fedora KDE</span><span class="lang-de">Mein Daily Driver: Ein ThinkPad T14 Gen 1 AMD mit Fedora KDE</span><span class="lang-pl">Mój codzienny sprzęt: ThinkPad T14 Gen 1 AMD z Fedorą KDE</span></div>
-    <p class="post-excerpt"><span class="lang-en">The used ThinkPad + Fedora combo is a cliché for a reason — it just works.</span><span class="lang-de">Die Kombi gebrauchtes ThinkPad + Fedora ist aus gutem Grund ein Klischee — sie funktioniert einfach.</span><span class="lang-pl">Używany ThinkPad + Fedora to klisza nie bez powodu — po prostu działa.</span></p>
+    <p class="post-excerpt"><span class="lang-en">Used ThinkPad plus Fedora. Everyone recommends it, and they're right.</span><span class="lang-de">Gebrauchtes ThinkPad plus Fedora. Alle empfehlen es, und alle haben recht.</span><span class="lang-pl">Używany ThinkPad plus Fedora. Wszyscy to polecają i wszyscy mają rację.</span></p>
   </a>
 
   <a class="post" href="posts/n100-nas.html">
     <div class="post-meta"><span>2026-07-01</span><span class="tag">#nas #storage</span><span><span class="lang-en">5 min read</span><span class="lang-de">5 Min. Lesezeit</span><span class="lang-pl">5 min czytania</span></span></div>
     <div class="post-title"><span class="lang-en">Building a Silent, Low-Power NAS on an Intel N100</span><span class="lang-de">Ein leiser, sparsamer Eigenbau-NAS auf Intel N100</span><span class="lang-pl">Cichy, energooszczędny NAS własnej roboty na Intelu N100</span></div>
-    <p class="post-excerpt"><span class="lang-en">Why I skipped Synology and built my own storage box for a fraction of the price.</span><span class="lang-de">Warum ich Synology übersprungen und mir für einen Bruchteil des Preises eine eigene Storage-Box gebaut habe.</span><span class="lang-pl">Dlaczego pominąłem Synology i zbudowałem własny serwer plików za ułamek ceny.</span></p>
+    <p class="post-excerpt"><span class="lang-en">I didn't buy a Synology. I built my own storage box for a lot less.</span><span class="lang-de">Ich habe keine Synology gekauft. Ich habe mir für viel weniger Geld selbst eine Storage-Kiste gebaut.</span><span class="lang-pl">Nie kupiłem Synology. Zbudowałem własny serwer plików za dużo mniej.</span></p>
   </a>
 
   <a class="post" href="posts/homelab-part-2.html">
     <div class="post-meta"><span>2026-06-24</span><span class="tag">#proxmox #homelab</span><span><span class="lang-en">8 min read</span><span class="lang-de">8 Min. Lesezeit</span><span class="lang-pl">8 min czytania</span></span></div>
-    <div class="post-title"><span class="lang-en">Homelab Part 2: The Raspberry Pi Tiebreaker and a 40Gbps Thunderbolt Cluster Link</span><span class="lang-de">Homelab Teil 2: Der Raspberry Pi als Zünglein an der Waage und ein 40-Gbps-Thunderbolt-Clusterlink</span><span class="lang-pl">Homelab część 2: Raspberry Pi jako rozjemca i łącze klastrowe Thunderbolt 40 Gb/s</span></div>
-    <p class="post-excerpt"><span class="lang-en">How a €30 Pi keeps my cluster honest, and how two laptops got a 40Gbps interconnect without a single expensive switch.</span><span class="lang-de">Wie ein 30-€-Pi meinen Cluster ehrlich hält — und wie zwei Laptops zu einem 40-Gbps-Interconnect kamen, ganz ohne teuren Switch.</span><span class="lang-pl">Jak Pi za 30 € pilnuje uczciwości klastra i jak dwa laptopy dostały łącze 40 Gb/s bez ani jednego drogiego switcha.</span></p>
+    <div class="post-title"><span class="lang-en">Homelab Part 2: The Raspberry Pi Tiebreaker and a Thunderbolt Cluster Link</span><span class="lang-de">Homelab Teil 2: Der Raspberry Pi als Zünglein an der Waage und ein Thunderbolt-Clusterlink</span><span class="lang-pl">Homelab część 2: Raspberry Pi jako rozjemca i łącze klastrowe Thunderbolt</span></div>
+    <p class="post-excerpt"><span class="lang-en">A €30 Pi that keeps my cluster honest, and a fast link between two laptops without buying a switch.</span><span class="lang-de">Ein 30-€-Pi, der meinen Cluster ehrlich hält, und ein schneller Link zwischen zwei Laptops, ganz ohne Switch.</span><span class="lang-pl">Pi za 30 €, które pilnuje uczciwości klastra, i szybkie łącze między dwoma laptopami bez kupowania switcha.</span></p>
   </a>
 
   <a class="post" href="posts/homelab-part-1.html">
     <div class="post-meta"><span>2026-06-10</span><span class="tag">#proxmox #homelab</span><span><span class="lang-en">6 min read</span><span class="lang-de">6 Min. Lesezeit</span><span class="lang-pl">6 min czytania</span></span></div>
     <div class="post-title"><span class="lang-en">Homelab Part 1: Base Setup, Installing Proxmox, and Getting Backups Running</span><span class="lang-de">Homelab Teil 1: Grundsetup, Proxmox-Installation und laufende Backups</span><span class="lang-pl">Homelab część 1: Konfiguracja bazowa, instalacja Proxmoxa i działające backupy</span></div>
-    <p class="post-excerpt"><span class="lang-en">The unglamorous first step every homelab needs — before containers, before Kubernetes, before anything fun.</span><span class="lang-de">Der unglamouröse erste Schritt, den jedes Homelab braucht — vor Containern, vor Kubernetes, vor allem Spaß.</span><span class="lang-pl">Mało efektowny pierwszy krok, którego potrzebuje każdy homelab — przed kontenerami, przed Kubernetesem, przed całą zabawą.</span></p>
+    <p class="post-excerpt"><span class="lang-en">The boring part. No Kubernetes, no dashboards, just hypervisors and backups.</span><span class="lang-de">Der langweilige Teil. Kein Kubernetes, keine Dashboards, nur Hypervisoren und Backups.</span><span class="lang-pl">Nudna część. Bez Kubernetesa, bez dashboardów, tylko hipernadzorcy i backupy.</span></p>
   </a>
 </main>
 
 <footer>
-  <p>© 2026 <span>Lootregen</span> · <span class="lang-en">Self-hosted in Switzerland</span><span class="lang-de">Selbst gehostet in der Schweiz</span><span class="lang-pl">Hostowane samodzielnie w Szwajcarii</span></p>
-
-  <div class="footer-links">
-    <a onclick="openLegal('privacy')"><span class="lang-en">Privacy Policy</span><span class="lang-de">Datenschutz</span><span class="lang-pl">Polityka prywatności</span></a>
-    <a onclick="openLegal('impressum')">Impressum</a>
-  </div>
+<p>© 2026 Mateusz Woźniak · <span class="lang-en">Made in Switzerland</span><span class="lang-de">Gemacht in der Schweiz</span><span class="lang-pl">Zrobione w Szwajcarii</span></p>
+<div class="footer-links"><a onclick="openLegal('privacy')"><span class="lang-en">Privacy Policy</span><span class="lang-de">Datenschutz</span><span class="lang-pl">Polityka prywatności</span></a><a onclick="openLegal('impressum')">Impressum</a></div>
 </footer>
 
 </body>
