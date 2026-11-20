@@ -1,0 +1,81 @@
+---
+# Webpage-lootregen on Azure Pipelines: the deploy half of a push to main.
+#
+#   GitHub Actions (.github/workflows/dockerfile.yml) builds the image, runs the smoke test and
+#   pushes ghcr.io/lootregenit/lootregen-site:<first 12 characters of the commit>.
+#   This pipeline waits for that tag, then commits it as newTag to the homelab repo.
+#   Flux sees the commit and rolls the site out. A rollback is a git revert in homelab.
+#
+# It runs on the self-hosted agents on K3s (pool lab-zrh-pve-01).
+# pr: none on purpose. This repo is public: code from a pull request never runs on those agents.
+# Secret: HOMELAB_PUSH_TOKEN from the variable group lab-secrets (fine-grained GitHub token,
+# Contents read/write on the homelab repo only).
+trigger:
+  branches:
+    include: [main]
+
+pr: none
+
+variables:
+  - group: lab-secrets
+  - name: IMAGE_REPO
+    value: lootregenit/lootregen-site
+  - name: GITOPS_REPO
+    value: https://github.com/Lootregenit/homelab.git
+
+pool:
+  name: lab-zrh-pve-01
+
+steps:
+  # Nothing from this repo is needed: only the commit id
+  - checkout: none
+
+  - script: |
+      set -euo pipefail
+      tag="${BUILD_SOURCEVERSION:0:12}"
+      echo "Waiting for ghcr.io/$IMAGE_REPO:$tag (GitHub Actions builds and pushes it)"
+      for try in $(seq 1 60); do
+        token="$(curl -fsS "https://ghcr.io/token?scope=repository:${IMAGE_REPO}:pull" | jq -r .token)"
+        code="$(curl -s -o /dev/null -w '%{http_code}' \
+          -H "Authorization: Bearer $token" \
+          -H "Accept: application/vnd.oci.image.index.v1+json" \
+          -H "Accept: application/vnd.oci.image.manifest.v1+json" \
+          -H "Accept: application/vnd.docker.distribution.manifest.list.v2+json" \
+          -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+          "https://ghcr.io/v2/${IMAGE_REPO}/manifests/${tag}")"
+        if [ "$code" = 200 ]; then
+          echo "Found it (try $try)."
+          exit 0
+        fi
+        sleep 15
+      done
+      echo "##vso[task.logissue type=error]No image $tag after 15 minutes. Is the GitHub Actions run of this commit green?"
+      exit 1
+    displayName: Wait for the image
+
+  - script: |
+      set -euo pipefail
+      tag="${BUILD_SOURCEVERSION:0:12}"
+      work="$(mktemp -d)"
+      trap 'rm -rf "$work"' EXIT
+
+      # The token goes to git through the environment, not the command line or a file
+      export GIT_CONFIG_COUNT=1
+      export GIT_CONFIG_KEY_0="http.https://github.com/.extraheader"
+      GIT_CONFIG_VALUE_0="Authorization: Basic $(printf 'x-access-token:%s' "$HOMELAB_PUSH_TOKEN" | base64 -w0)"
+      export GIT_CONFIG_VALUE_0
+
+      git clone --quiet --depth 1 "$GITOPS_REPO" "$work/homelab"
+      cd "$work/homelab"
+      bash scripts/set-image-tag.sh apps/lootregen "$tag"
+      if git diff --quiet; then
+        echo "homelab already has $tag. Nothing to deploy."
+        exit 0
+      fi
+      git -c user.name="Azure Pipelines" -c user.email="azure-pipelines@lootregen.com" \
+        commit --quiet -am "deploy(lootregen): $tag"
+      git push --quiet origin HEAD:main
+      echo "Committed $tag to homelab. Flux rolls it out within about two minutes."
+    displayName: Set the image tag in homelab
+    env:
+      HOMELAB_PUSH_TOKEN: $(HOMELAB_PUSH_TOKEN)
