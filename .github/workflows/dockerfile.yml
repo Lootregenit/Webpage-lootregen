@@ -1,8 +1,10 @@
 ---
 name: dockerfile
 
-# Quick check on GitHub that the image builds and serves the site.
-# Real builds and deploys run on Jenkins (jenkins-01 -> K3s build pods).
+# Builds the image and checks that it serves the site. On main it also pushes
+# ghcr.io/lootregenit/lootregen-site:<first 12 characters of the commit>.
+# The deploy is azure-pipelines.yml: Azure Pipelines (agent on K3s) waits for that tag
+# and commits it to the homelab repo; Flux rolls it out.
 on:
   pull_request:
   push:
@@ -10,6 +12,10 @@ on:
 
 permissions:
   contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/lootregenit/lootregen-site
 
 jobs:
   build:
@@ -23,7 +29,11 @@ jobs:
           dockerfile: Dockerfile
 
       - name: build
-        run: docker build -t site:ci .
+        run: |
+          docker build \
+            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            --label "org.opencontainers.image.revision=${{ github.sha }}" \
+            -t site:ci .
 
       - name: smoke test
         run: |
@@ -45,3 +55,14 @@ jobs:
           curl -s http://localhost:8080/does-not-exist | grep -qi '<html' || { echo "custom 404 page missing"; fail=1; }
           docker logs site | tail -n 20
           exit "$fail"
+
+      # Only an image that passed the smoke test gets a tag. The package must allow this
+      # repo to write: ghcr package settings -> Manage Actions access -> Webpage-lootregen, Write.
+      - name: push (main only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          TAG="${GITHUB_SHA::12}"
+          docker tag site:ci "$IMAGE:$TAG"
+          docker push "$IMAGE:$TAG"
+          echo "Pushed $IMAGE:$TAG" >> "$GITHUB_STEP_SUMMARY"

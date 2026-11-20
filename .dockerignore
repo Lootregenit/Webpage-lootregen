@@ -1,6 +1,6 @@
 .git
 .github
-Jenkinsfile
+azure-pipelines.yml
 README*.md
 *.log
 webpage/.thumbnail

@@ -101,8 +101,8 @@ flowchart TB
 
 ```text
 edit webpage/ -> git push
-  -> image ghcr.io/lootregenit/lootregen-site:<commit>  (Jenkins on K3s; by hand until it runs)
-  -> newTag: <commit> in homelab/apps/lootregen/kustomization.yaml
+  -> image ghcr.io/lootregenit/lootregen-site:<commit>  (GitHub Actions: build, smoke test, push)
+  -> newTag: <commit> in homelab/apps/lootregen/kustomization.yaml  (Azure Pipelines, agent on K3s)
   -> Flux applies it -> rolling update, the PodDisruptionBudget keeps one pod serving
 ```
 
@@ -121,7 +121,8 @@ edit webpage/ -> git push
 | 🔁 Delivery | Flux | Git is the only way into the cluster; drift gets reverted |
 | 📦 Images | ghcr.io | One image per commit, tag = commit SHA |
 | 🔑 Secrets | SOPS + age | Tunnel token lives encrypted in Git; only the cluster can decrypt it |
-| ✅ CI | GitHub Actions | hadolint, build and smoke test on every push |
+| ✅ CI | GitHub Actions | hadolint, build and smoke test on every push; pushes the image on `main` |
+| 🚀 CD | Azure Pipelines | A self-hosted agent on K3s commits the new image tag to the GitOps repo |
 
 ---
 
@@ -133,9 +134,9 @@ edit webpage/ -> git push
 ├── Dockerfile            # nginx-unprivileged with webpage/ baked in
 ├── nginx.conf            # clean URLs, custom 404, caching, security headers
 ├── .dockerignore
-├── Jenkinsfile           # build pod on K3s -> ghcr.io -> tag bump in homelab
+├── azure-pipelines.yml   # deploy: waits for the image, commits the tag to homelab
 ├── .github/workflows/
-│   └── dockerfile.yml    # hadolint + build + smoke test
+│   └── dockerfile.yml    # hadolint + build + smoke test, push on main
 └── webpage/              # the site: index.html (EN/DE/PL via ?lang=), blog, posts, 404
 ```
 
@@ -143,15 +144,15 @@ edit webpage/ -> git push
 
 ## 🚀 Deploying a change
 
-Once Jenkins runs, a push to `main` is all it takes. Until then, from my PC:
+A push to `main` is all it takes:
 
-```bash
-TAG=$(git rev-parse --short=12 HEAD)
-docker build -t ghcr.io/lootregenit/lootregen-site:$TAG .
-docker push ghcr.io/lootregenit/lootregen-site:$TAG
-```
+1. GitHub Actions builds the image, runs the smoke test and pushes `lootregen-site:<12-char commit>`.
+2. Azure Pipelines (a self-hosted agent on K3s) waits for that tag and commits
+   `newTag: <commit>` to `apps/lootregen/kustomization.yaml` in the `homelab` repo.
+3. Flux sees the commit and rolls it out, usually within two minutes.
 
-Then set `newTag: <TAG>` in `apps/lootregen/kustomization.yaml` in the `homelab` repo and push. Flux rolls it out within a few minutes.
+By hand (if the pipelines are down): build and push the image with `docker`, then in `homelab`
+run `bash scripts/set-image-tag.sh apps/lootregen <TAG>`, commit and push.
 
 **Rollback:** `git revert` the deploy commit in `homelab`.
 
@@ -278,7 +279,7 @@ Traffic inside the cluster stays HTTP. Simpler, and the hop from cloudflared to 
 
 - [x] **Flux** for true GitOps — push to Git, the cluster reconciles automatically
 - [x] **More K3s nodes** for real HA — three servers now; the site survives a node going down
-- [ ] **Jenkins pipeline** — build on K3s, push to ghcr.io, bump the tag (the `Jenkinsfile` is ready)
+- [x] **Pipeline** — GitHub Actions builds and pushes the image, Azure Pipelines sets the tag, Flux deploys
 - [ ] **Prometheus + Grafana + Loki** for observability (response times, error rates, resource usage)
 - [ ] **Renovate** to keep image and chart versions current
 - [ ] **Ingress + cert-manager** for direct LAN access (cert-manager already runs in the cluster)
